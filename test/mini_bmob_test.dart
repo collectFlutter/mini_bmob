@@ -44,7 +44,7 @@ void main() {
       expect(flag, true);
       flag = await _user.updatePassword('111111', '123456');
       expect(flag, true);
-      L.i(_user.getBody());
+      L.i(_user.createJson());
     });
 
     test('deleteFieldValue', () async {

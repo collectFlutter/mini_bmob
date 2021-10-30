@@ -20,10 +20,17 @@ class BmobUserTable extends BmobTable {
   @override
   String getBmobTabName() => "_User";
 
-  BmobUserTable.formJson(Map<String, dynamic> json) : super.formJson(json);
+  @override
+  void fromJson(Map<String, dynamic> json) {
+    super.fromJson(json);
+    username = json['username'];
+    password = json['password'];
+    email = json['email'];
+    mobilePhoneNumber = json['mobilePhoneNumber'];
+  }
 
   @override
-  Map<String, dynamic> getBody() => {
+  Map<String, dynamic> createJson() => {
         "username": username,
         "password": password,
         "email": email,
@@ -33,7 +40,7 @@ class BmobUserTable extends BmobTable {
   /// 注册
   @override
   Future<bool> install() async {
-    var data = await BmobNetHelper.init().post('/1/users', body: getBody());
+    var data = await BmobNetHelper.init().post('/1/users', body: createJson());
     if (data != null &&
         data.containsKey('createdAt') &&
         data.containsKey('objectId')) {
@@ -56,12 +63,7 @@ class BmobUserTable extends BmobTable {
     if (data != null &&
         data.containsKey('createdAt') &&
         data.containsKey('objectId')) {
-      createdAt = data['createdAt'];
-      updatedAt = data['updatedAt'];
-      objectId = data['objectId'];
-      sessionToken = data['sessionToken'];
-      mobilePhoneNumber = data['mobilePhoneNumber'];
-      username = data['username'];
+      fromJson(data);
       return true;
     }
     return false;
@@ -76,23 +78,20 @@ class BmobUserTable extends BmobTable {
         .get('/1/checkSession/$objectId', session: sessionToken);
     return data != null && data.containsKey('msg') && data['msg'] == 'ok';
   }
-  
+
   /// 获取用户信息
-  Future<bool> getInfo() async{
-    if(objectId == null) throw Exception("objectId is null");
+  @override
+  Future<bool> getInfo({List<String> include = const []}) async {
+    if (objectId == null) throw Exception("objectId is null");
     var data = await BmobNetHelper.init().get('/1/users/$objectId');
-    if(data!=null && data.containsKey('objectId')){
-      username = data['username'];
-      createdAt = data['createdAt'];
-      updatedAt = data['updatedAt'];
-      email = data['email'];
-      mobilePhoneNumber = data['mobilePhoneNumber'];
+    if (data != null && data.containsKey('objectId')) {
+      fromJson(data);
       return true;
     }
     return false;
   }
 
-  /// 删除自己的账户 
+  /// 删除自己的账户
   @override
   Future<bool> delete() async {
     if (objectId == null) throw Exception('objectId is null');
@@ -123,7 +122,7 @@ class BmobUserTable extends BmobTable {
     }
     var data = await BmobNetHelper.init().put(
       '/1/users/$objectId',
-      body: body ?? getBody(),
+      body: body ?? createJson(),
       session: sessionToken,
     );
     if (data != null && data.containsKey('updatedAt')) {
