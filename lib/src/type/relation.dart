@@ -1,18 +1,65 @@
+import 'dart:convert';
+
 import 'package:mini_bmob/src/table/bmob_table.dart';
 import 'package:mini_bmob/src/type/pointer.dart';
 
-class Relation<T extends BmobTable> {
-  late List<T> list;
+import '../bmon_net_helper.dart';
 
-  Relation(this.list);
+typedef JsonToTable<T extends BmobTable> = T Function(
+    Map<String, dynamic> json);
+
+class Relation<T extends BmobTable, S extends BmobTable> {
+  /// 列表内容
+  List<S> list = [];
+
+  /// 主对象
+  late T object;
+
+  /// 列表对象
+  late S subset;
+
+  /// json 转换 对象
+  late JsonToTable<S> jsonToTable;
+
+  /// 关联的key
+  String key;
+
+  Relation(this.object, this.subset, this.key, this.jsonToTable,
+      [this.list = const []]);
 
   Map<String, dynamic> createJson() => {
         "__op": "AddRelation",
-        "objects": list.map((object) => Pointer(object).createJson()).toList()
+        "objects": list.map((e) => Pointer(object,e).createJson()).toList()
       };
 
   Map<String, dynamic> toRemove() => {
         "__op": "RemoveRelation",
-        "objects": list.map((object) => Pointer(object).createJson()).toList()
+        "objects": list.map((e) => Pointer(object,e).createJson()).toList()
       };
+
+  Future<bool> include() async {
+    if (object.objectId == null) throw Exception('objectId is null');
+    var data = await BmobNetHelper.init().get(
+      '/1/classes/${subset.objectId}',
+      body: {
+        "where": {
+          "\$relatedTo": {
+            "object": {
+              "__type": "Pointer",
+              "className": object.getBmobTabName(),
+              "objectId": object.objectId,
+            },
+            "key": key,
+          }
+        }
+      },
+    );
+    if (data != null && data.containsKey('results')) {
+      List _list = data['results'];
+      list = _list.map((e) => jsonToTable(e)).toList();
+      return true;
+    }
+    list = [];
+    return false;
+  }
 }
