@@ -1,4 +1,4 @@
-import 'package:mini_bmob/src/bmon_net_helper.dart';
+import 'package:mini_bmob/src/helper/bmon_net_helper.dart';
 
 abstract class BmobTable {
   /// 数据表名称
@@ -14,8 +14,8 @@ abstract class BmobTable {
 
   void fromJson(Map<String, dynamic> json) {
     objectId = json['objectId'];
-    createdAt = json['createAt'];
-    updatedAt = json['updateAt'];
+    createdAt = json['createdAt'];
+    updatedAt = json['updatedAt'];
   }
 
   /// 插入一条新记录
@@ -46,11 +46,12 @@ abstract class BmobTable {
   }
 
   /// 获取记录详情
+  /// [include] 需要联合查询的字段名称及筛选的字段，多字段用｜隔开，例如 include = ["author[name|age]"]
   Future<bool> getInfo({List<String> include = const []}) async {
     if (objectId == null) throw Exception('objectId is null');
     Map<String, String>? body;
     if (include.isNotEmpty) {
-      body = {"include": include.join(',')};
+      body = {"include": include.join('.')};
     }
     var data = await BmobNetHelper.init()
         .get("/1/classes/${getBmobTabName()}/$objectId", body: body);
@@ -85,11 +86,9 @@ abstract class BmobTable {
     return false;
   }
 
-  Map<String, dynamic> dateToJson(DateTime dateTime) => {
-        "__type": "Date",
-        "iso": dateTime.toIso8601String().replaceAll('T', ' ')
+  Map<String, dynamic> toJson() => {
+        'objectId': objectId,
+        'createdAt': createdAt,
+        'updatedAt': updatedAt,
       };
-
-  DateTime? jsonToDate(Map<String, dynamic> json) =>
-      DateTime.tryParse(json['iso']);
 }

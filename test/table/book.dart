@@ -3,23 +3,23 @@ import 'package:mini_bmob/mini_bmob.dart';
 import 'author.dart';
 import 'category.dart';
 
-class Book extends BmobTable {
+class BookTable extends BmobTable {
   String? name;
-  late Relation<Book, Author> author;
-  late Pointer<Book, Category> category;
+  late Relation<BookTable, AuthorTable> author;
+  late Pointer<CategoryTable> category;
 
-  Book({this.name, List<Author>? author, Category? category}) {
+  BookTable({this.name, List<AuthorTable>? author, CategoryTable? category}) {
     assert(category == null || category.objectId != null);
     assert(
         author == null || !author.any((element) => element.objectId == null));
     this.author = Relation(
       this,
-      Author(),
+      AuthorTable(),
       'author',
-      (json) => Author()..fromJson(json),
+      (json) => AuthorTable()..fromJson(json),
       author ?? [],
     );
-    this.category = Pointer(this, category);
+    this.category = Pointer(category);
   }
 
   @override
@@ -35,10 +35,19 @@ class Book extends BmobTable {
   @override
   void fromJson(Map<String, dynamic> json) {
     super.fromJson(json);
+    name = json['name'];
     if (category.subSet == null) {
-      category.subSet = Category()..fromJson(json);
+      category.subSet = CategoryTable()..fromJson(json['category']);
     } else {
-      category.fromJson(json);
+      category.fromJson(json['category']);
     }
   }
+
+  @override
+  Map<String, dynamic> toJson() => {
+        ...super.toJson(),
+        'name': name,
+        'author': author.toJson(),
+        'category': category.toJson(),
+      };
 }

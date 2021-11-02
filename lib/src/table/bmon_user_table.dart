@@ -1,7 +1,7 @@
 import 'package:mini_bmob/mini_bmob.dart';
 import 'package:mini_bmob/src/table/bmob_table.dart';
 
-import '../bmon_net_helper.dart';
+import '../helper/bmon_net_helper.dart';
 
 class BmobUserTable extends BmobTable {
   String? sessionToken;
@@ -131,4 +131,14 @@ class BmobUserTable extends BmobTable {
     }
     return false;
   }
+
+  @override
+  Map<String, dynamic> toJson() => {
+        ...super.toJson(),
+        'username': username,
+        'password': password,
+        'email': email,
+        'mobilePhoneNumber': mobilePhoneNumber,
+        'sessionToken': sessionToken,
+      };
 }

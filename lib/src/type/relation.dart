@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:mini_bmob/src/table/bmob_table.dart';
 import 'package:mini_bmob/src/type/pointer.dart';
 
-import '../bmon_net_helper.dart';
+import '../helper/bmon_net_helper.dart';
 
 typedef JsonToTable<T extends BmobTable> = T Function(
     Map<String, dynamic> json);
@@ -29,20 +29,20 @@ class Relation<T extends BmobTable, S extends BmobTable> {
 
   Map<String, dynamic> createJson() => {
         "__op": "AddRelation",
-        "objects": list.map((e) => Pointer(object,e).createJson()).toList()
+        "objects": list.map((e) => Pointer(e).createJson()).toList()
       };
 
   Map<String, dynamic> toRemove() => {
         "__op": "RemoveRelation",
-        "objects": list.map((e) => Pointer(object,e).createJson()).toList()
+        "objects": list.map((e) => Pointer(e).createJson()).toList()
       };
 
   Future<bool> include() async {
     if (object.objectId == null) throw Exception('objectId is null');
     var data = await BmobNetHelper.init().get(
-      '/1/classes/${subset.objectId}',
+      '/1/classes/${subset.getBmobTabName()}',
       body: {
-        "where": {
+        "where": jsonEncode({
           "\$relatedTo": {
             "object": {
               "__type": "Pointer",
@@ -51,7 +51,7 @@ class Relation<T extends BmobTable, S extends BmobTable> {
             },
             "key": key,
           }
-        }
+        })
       },
     );
     if (data != null && data.containsKey('results')) {
@@ -62,4 +62,6 @@ class Relation<T extends BmobTable, S extends BmobTable> {
     list = [];
     return false;
   }
+
+  List<Map<String, dynamic>> toJson() => list.map((e) => e.toJson()).toList();
 }
