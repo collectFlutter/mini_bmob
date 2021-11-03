@@ -8,9 +8,11 @@ environment:
   flutter: ">=1.17.0"
 
 dependencies:
+  crypto: ^3.0.1
   flutter:
     sdk: flutter
   mini_net: ^0.3.0
+  uuid: ^3.0.5
 
 dev_dependencies:
   flutter_test:

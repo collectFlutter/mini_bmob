@@ -5,7 +5,6 @@ import 'package:mini_bmob/src/type/relation.dart';
 class ResponseList<T extends BmobTable> {
   late List<T> results;
   late int count;
-  late JsonToTable<T> jsonToTable;
 
   ResponseList._();
 
@@ -15,7 +14,12 @@ class ResponseList<T extends BmobTable> {
   }
 
   ResponseList.fromJson(Map<String, dynamic> json, JsonToTable<T> jsonToTable) {
-    results = (json['results'] ?? []).map((e) => jsonToTable(e)).toList();
-    count = json[''] ?? 0;
+    results = [];
+    List _results = json['results'] ?? [];
+    for (var element in _results) {
+      T object = jsonToTable(element);
+      results.add(object);
+    }
+    count = json['count'] ?? 0;
   }
 }

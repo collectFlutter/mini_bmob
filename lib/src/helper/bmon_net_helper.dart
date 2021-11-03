@@ -19,7 +19,7 @@ class BmobNetHelper {
   }) async {
     NetManager manager = NetManager.internal(
       baseUrl: _config.host,
-      headers: _config.getHeaders(session),
+      headers: _config.getHeaders(session: session, url: path),
       connectTimeout: 5000,
       interceptors: [
         MiniLogInterceptor(
@@ -46,7 +46,7 @@ class BmobNetHelper {
   }) async {
     NetManager manager = NetManager.internal(
       baseUrl: _config.host,
-      headers: _config.getHeaders(session),
+      headers: _config.getHeaders(session: session, url: path),
       connectTimeout: 5000,
       interceptors: [
         MiniLogInterceptor(
@@ -73,7 +73,7 @@ class BmobNetHelper {
   }) async {
     NetManager manager = NetManager.internal(
       baseUrl: _config.host,
-      headers: _config.getHeaders(session),
+      headers: _config.getHeaders(session: session, url: path),
       connectTimeout: 5000,
       interceptors: [
         MiniLogInterceptor(
@@ -100,7 +100,7 @@ class BmobNetHelper {
   }) async {
     NetManager manager = NetManager.internal(
       baseUrl: _config.host,
-      headers: _config.getMasterHeaders(),
+      headers: _config.getHeaders(session: session, url: path),
       connectTimeout: 5000,
       interceptors: [
         MiniLogInterceptor(
