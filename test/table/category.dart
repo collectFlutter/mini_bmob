@@ -16,10 +16,11 @@ class CategoryTable extends BmobTable {
       };
 
   @override
-  void fromJson(Map<String, dynamic> json) {
+  CategoryTable fromJson(Map<String, dynamic> json) {
     super.fromJson(json);
     name = json['name'];
     code = json['code'];
+    return this;
   }
 
   @override

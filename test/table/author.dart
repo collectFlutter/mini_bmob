@@ -16,10 +16,11 @@ class AuthorTable extends BmobTable {
       };
 
   @override
-  void fromJson(Map<String, dynamic> json) {
+  AuthorTable fromJson(Map<String, dynamic> json) {
     super.fromJson(json);
     name = json['name'];
     nationality = json['nationality'];
+    return this;
   }
 
   @override

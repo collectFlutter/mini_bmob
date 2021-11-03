@@ -8,16 +8,19 @@ class BookTable extends BmobTable {
   late Relation<BookTable, AuthorTable> author;
   late Pointer<CategoryTable> category;
 
-  BookTable({this.name, List<AuthorTable>? author, CategoryTable? category}) {
+  BookTable(
+      {this.name,
+      List<AuthorTable> author = const [],
+      CategoryTable? category}) {
     assert(category == null || category.objectId != null);
     assert(
-        author == null || !author.any((element) => element.objectId == null));
+        author.isEmpty || !author.any((element) => element.objectId == null));
     this.author = Relation(
       this,
       AuthorTable(),
       'author',
-      (json) => AuthorTable()..fromJson(json),
-      author ?? [],
+      (json) => AuthorTable().fromJson(json),
+      author,
     );
     this.category = Pointer(category);
   }
@@ -33,7 +36,7 @@ class BookTable extends BmobTable {
       };
 
   @override
-  void fromJson(Map<String, dynamic> json) {
+  BookTable fromJson(Map<String, dynamic> json) {
     super.fromJson(json);
     name = json['name'];
     if (category.subSet == null) {
@@ -41,6 +44,14 @@ class BookTable extends BmobTable {
     } else {
       category.fromJson(json['category']);
     }
+    author = Relation(
+      this,
+      AuthorTable(),
+      'author',
+      (json) => AuthorTable().fromJson(json),
+      [],
+    );
+    return this;
   }
 
   @override
