@@ -17,9 +17,9 @@ class QueryHelper {
       body: where?.builder(),
     );
     if (data == null || !data.containsKey('results')) {
-      return ResponseList.empty();
+      return ResponseList<T>.empty();
     }
-    return ResponseList.fromJson(data, jsonToTable);
+    return ResponseList<T>.fromJson(data, jsonToTable);
   }
 
   /// 查询列表

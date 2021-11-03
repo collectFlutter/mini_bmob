@@ -12,10 +12,11 @@ abstract class BmobTable {
 
   BmobTable();
 
-  void fromJson(Map<String, dynamic> json) {
+  BmobTable fromJson(Map<String, dynamic> json) {
     objectId = json['objectId'];
     createdAt = json['createdAt'];
     updatedAt = json['updatedAt'];
+    return this;
   }
 
   /// 插入一条新记录

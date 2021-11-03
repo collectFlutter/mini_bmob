@@ -27,14 +27,16 @@ class Relation<T extends BmobTable, S extends BmobTable> {
   Relation(this.object, this.subset, this.key, this.jsonToTable,
       [this.list = const []]);
 
-  Map<String, dynamic> createJson() => {
+  Map<String, dynamic> createJson([List<S>? list]) => {
         "__op": "AddRelation",
-        "objects": list.map((e) => Pointer(e).createJson()).toList()
+        "objects":
+            (list ?? this.list).map((e) => Pointer(e).createJson()).toList()
       };
 
-  Map<String, dynamic> toRemove() => {
+  Map<String, dynamic> _removeJson([List<S>? list]) => {
         "__op": "RemoveRelation",
-        "objects": list.map((e) => Pointer(e).createJson()).toList()
+        "objects":
+            (list ?? this.list).map((e) => Pointer(e).createJson()).toList()
       };
 
   Future<bool> include() async {
@@ -60,6 +62,57 @@ class Relation<T extends BmobTable, S extends BmobTable> {
       return true;
     }
     list = [];
+    return false;
+  }
+
+  /// 添加关联对象
+  Future<bool> add([List<S> list = const []]) async {
+    if (object.objectId == null) throw Exception('objectId is null');
+    if (list.isEmpty) return true;
+    var data = await BmobNetHelper.init().put(
+      '/1/classes/${object.getBmobTabName()}/${object.objectId}',
+      body: {key: createJson(list)},
+    );
+    if (data != null && data.containsKey('updatedAt')) {
+      var _list = list
+          .where((e1) => !this.list.any((e2) => e1.objectId == e2.objectId));
+      if (_list.isNotEmpty) {
+        this.list.addAll(_list);
+      }
+      return true;
+    }
+    return false;
+  }
+
+  /// 移除关联对象
+  Future<bool> remove([List<S> list = const []]) async {
+    if (object.objectId == null) throw Exception('objectId is null');
+    if (list.isEmpty) return true;
+    var data = await BmobNetHelper.init().put(
+      '/1/classes/${object.getBmobTabName()}/${object.objectId}',
+      body: {key: _removeJson(list)},
+    );
+    if (data != null && data.containsKey('updatedAt')) {
+      this
+          .list
+          .removeWhere((e1) => list.any((e2) => e1.objectId == e2.objectId));
+      return true;
+    }
+    return false;
+  }
+
+  /// 清空关联对象
+  Future<bool> clear() async {
+    if (object.objectId == null) throw Exception('objectId is null');
+    if (list.isEmpty) return true;
+    var data = await BmobNetHelper.init().put(
+      '/1/classes/${object.getBmobTabName()}/${object.objectId}',
+      body: {key: _removeJson(list)},
+    );
+    if (data != null && data.containsKey('updatedAt')) {
+      list.clear();
+      return true;
+    }
     return false;
   }
 

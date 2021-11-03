@@ -21,12 +21,18 @@ class BmobUserTable extends BmobTable {
   String getBmobTabName() => "_User";
 
   @override
-  void fromJson(Map<String, dynamic> json) {
+  BmobUserTable fromJson(Map<String, dynamic> json) {
     super.fromJson(json);
     username = json['username'];
-    password = json['password'];
+    if (json.containsKey('password')) {
+      password = json['password'];
+    }
     email = json['email'];
     mobilePhoneNumber = json['mobilePhoneNumber'];
+    if (json.containsKey('sessionToken')) {
+      sessionToken = json['sessionToken'];
+    }
+    return this;
   }
 
   @override
@@ -55,6 +61,7 @@ class BmobUserTable extends BmobTable {
 
   /// 登陆,username\email\mobilePhoneNumber都可以
   Future<bool> login() async {
+    assert(!(username == null && email == null && mobilePhoneNumber == null));
     var body = {
       "username": username ?? email ?? mobilePhoneNumber,
       "password": password

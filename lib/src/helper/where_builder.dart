@@ -7,7 +7,7 @@ class WhereBuilder {
   final List<Map<String, dynamic>> _or = [];
   final List<Map<String, dynamic>> _and = [];
   final List<String> _keys = [];
-  late List<String> _order;
+  late List<String> _order = [];
   int? _count;
   int? _limit;
 
