@@ -1,14 +1,14 @@
 import 'dart:convert';
 
-import 'package:mini_bmob/src/table/bmob_table.dart';
-import 'package:mini_bmob/src/type/pointer.dart';
+import '../table/_table.dart';
+import '../type/pointer.dart';
 
-import '../helper/bmon_net_helper.dart';
+import '../helper/net_helper.dart';
 
 typedef JsonToTable<T extends BmobTable> = T Function(
     Map<String, dynamic> json);
 
-class Relation<T extends BmobTable, S extends BmobTable> {
+class BmobRelation<T extends BmobTable, S extends BmobTable> {
   /// 列表内容
   List<S> list = [];
 
@@ -24,19 +24,19 @@ class Relation<T extends BmobTable, S extends BmobTable> {
   /// 关联的key
   String key;
 
-  Relation(this.object, this.subset, this.key, this.jsonToTable,
+  BmobRelation(this.object, this.subset, this.key, this.jsonToTable,
       [this.list = const []]);
 
   Map<String, dynamic> createJson([List<S>? list]) => {
         "__op": "AddRelation",
         "objects":
-            (list ?? this.list).map((e) => Pointer(e).createJson()).toList()
+            (list ?? this.list).map((e) => BmobPointer(e).createJson()).toList()
       };
 
   Map<String, dynamic> _removeJson([List<S>? list]) => {
         "__op": "RemoveRelation",
         "objects":
-            (list ?? this.list).map((e) => Pointer(e).createJson()).toList()
+            (list ?? this.list).map((e) => BmobPointer(e).createJson()).toList()
       };
 
   Future<bool> include() async {

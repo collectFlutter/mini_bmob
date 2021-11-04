@@ -1,9 +1,9 @@
-import 'dart:convert';
-
 import 'package:flutter_test/flutter_test.dart';
-
 import 'package:mini_bmob/mini_bmob.dart';
 import 'package:mini_logger/mini_logger.dart';
+
+import 'dart:convert';
+
 import 'table/author.dart';
 import 'table/book.dart';
 import 'table/category.dart';
@@ -122,14 +122,14 @@ void main() {
 
   group('Batch Test', () {
     test('batch delete', () async {
-      WhereBuilder _where = WhereBuilder();
+      BmobWhereBuilder _where = BmobWhereBuilder();
       _where.whereAdd('nationality').contain(['中国']);
-      ResponseList<AuthorTable> _list = await QueryHelper.list(
+      BmobSetResponse<AuthorTable> _list = await BmobQueryHelper.list(
         AuthorTable(),
         (json) => AuthorTable().fromJson(json),
         where: _where,
       );
-      Batch batch = Batch();
+      BmobBatch batch = BmobBatch();
       for (var element in _list.results) {
         batch.delete(element);
       }
@@ -139,15 +139,15 @@ void main() {
     });
 
     test('batch update', () async {
-      WhereBuilder _where = WhereBuilder();
+      BmobWhereBuilder _where = BmobWhereBuilder();
       _where.whereAdd('nationality').contain(['China']);
       _where.page(1, 10);
-      ResponseList<AuthorTable> _list = await QueryHelper.list(
+      BmobSetResponse<AuthorTable> _list = await BmobQueryHelper.list(
         AuthorTable(),
         (json) => AuthorTable().fromJson(json),
         where: _where,
       );
-      Batch batch = Batch();
+      BmobBatch batch = BmobBatch();
       batch.updateAll(_list.results, body: {'nationality': '中国'});
       L.i(batch.request);
       var date = await batch.post();
@@ -159,7 +159,7 @@ void main() {
         100,
         (index) => AuthorTable(name: 'JsonYe${index + 1}', nationality: '中国'),
       );
-      Batch batch = Batch();
+      BmobBatch batch = BmobBatch();
       for (var element in authors) {
         batch.create(element);
       }
@@ -200,7 +200,7 @@ void main() {
 
   group('WhereBuilder Test', () {
     test("聚合查询", () {
-      WhereBuilder agr = WhereBuilder();
+      BmobWhereBuilder agr = BmobWhereBuilder();
       agr.max(['age', 'height']).min(['age', 'height']).average(
           ['age', 'height']).sum(['age']).groupBy(fields: [
         'sex'
@@ -209,7 +209,7 @@ void main() {
     });
 
     test('条件查询', () {
-      WhereBuilder where = WhereBuilder();
+      BmobWhereBuilder where = BmobWhereBuilder();
       where
           .whereAdd<int>('age')
           .lt(100)
@@ -235,7 +235,7 @@ void main() {
 
   group('QueryHelper Test', () {
     test('batch test', () async {
-      Batch batch = Batch();
+      BmobBatch batch = BmobBatch();
       batch.request.addAll([
         {
           "method": "POST",
@@ -289,7 +289,7 @@ void main() {
         }
       ]);
       L.i(jsonEncode(batch.request));
-      await QueryHelper.batch(batch);
+      await BmobQueryHelper.batch(batch);
     });
   });
 }

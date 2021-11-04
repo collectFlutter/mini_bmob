@@ -1,4 +1,4 @@
-import 'package:mini_bmob/src/type/date_time.dart';
+import '../type/date_time.dart';
 
 class BmobArray<T> {
   List<T> list = [];

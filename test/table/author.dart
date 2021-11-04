@@ -11,6 +11,7 @@ class AuthorTable extends BmobTable {
 
   @override
   Map<String, dynamic> createJson() => {
+        ...super.createJson(),
         'name': name,
         'nationality': nationality,
       };

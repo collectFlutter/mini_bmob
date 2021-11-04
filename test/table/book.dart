@@ -5,8 +5,8 @@ import 'category.dart';
 
 class BookTable extends BmobTable {
   String? name;
-  late Relation<BookTable, AuthorTable> author;
-  late Pointer<CategoryTable> category;
+  late BmobRelation<BookTable, AuthorTable> author;
+  late BmobPointer<CategoryTable> category;
 
   BookTable(
       {this.name,
@@ -15,14 +15,14 @@ class BookTable extends BmobTable {
     assert(category == null || category.objectId != null);
     assert(
         author.isEmpty || !author.any((element) => element.objectId == null));
-    this.author = Relation(
+    this.author = BmobRelation(
       this,
       AuthorTable(),
       'author',
       (json) => AuthorTable().fromJson(json),
       author,
     );
-    this.category = Pointer(category);
+    this.category = BmobPointer(category);
   }
 
   @override
@@ -30,6 +30,7 @@ class BookTable extends BmobTable {
 
   @override
   Map<String, dynamic> createJson() => {
+        ...super.createJson(),
         "name": name,
         "category": category.createJson(),
         "author": author.createJson(),
@@ -44,7 +45,7 @@ class BookTable extends BmobTable {
     } else {
       category.fromJson(json['category']);
     }
-    author = Relation(
+    author = BmobRelation(
       this,
       AuthorTable(),
       'author',

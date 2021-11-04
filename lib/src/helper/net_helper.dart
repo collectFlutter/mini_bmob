@@ -1,4 +1,4 @@
-import 'package:mini_bmob/src/bmon_config.dart';
+import '../config.dart';
 import 'package:mini_net/mini_net.dart';
 
 class BmobNetHelper {

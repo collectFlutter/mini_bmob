@@ -1,13 +1,12 @@
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:mini_bmob/mini_bmob.dart';
-import 'package:mini_bmob/src/table/bmob_role_table.dart';
 import 'package:mini_logger/mini_logger.dart';
+
 import 'table/author.dart';
 import 'table/book.dart';
 import 'table/category.dart';
 import 'config.dart';
-import 'package:uuid/uuid.dart';
 
 // 加密请求
 void main() {
@@ -111,7 +110,7 @@ void main() {
 
   group('WhereBuilder Test', () {
     test("聚合查询", () {
-      WhereBuilder agr = WhereBuilder();
+      BmobWhereBuilder agr = BmobWhereBuilder();
       agr.max(['age', 'height']).min(['age', 'height']).average(
           ['age', 'height']).sum(['age']).groupBy(fields: [
         'sex'
@@ -120,7 +119,7 @@ void main() {
     });
 
     test('条件查询', () {
-      WhereBuilder where = WhereBuilder();
+      BmobWhereBuilder where = BmobWhereBuilder();
       where
           .whereAdd<int>('age')
           .lt(100)

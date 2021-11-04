@@ -1,13 +1,22 @@
 import 'package:mini_bmob/mini_bmob.dart';
-import 'package:mini_bmob/src/table/bmob_table.dart';
+import '../table/_table.dart';
 
-import '../helper/bmon_net_helper.dart';
+import '../helper/net_helper.dart';
 
 class BmobUserTable extends BmobTable {
+  /// 登陆后，返回的session
   String? sessionToken;
+
+  /// 用户名，不可重复
   String? username;
+
+  /// 密码，登陆时必填
   String? password;
+
+  /// 邮箱，不可重复
   String? email;
+
+  /// 手机号码，不可重复
   String? mobilePhoneNumber;
 
   BmobUserTable({
@@ -37,10 +46,17 @@ class BmobUserTable extends BmobTable {
 
   @override
   Map<String, dynamic> createJson() => {
+        ...super.createJson(),
         "username": username,
-        "password": password,
-        "email": email,
-        "mobilePhoneNumber": mobilePhoneNumber,
+        if (password != null) ...{
+          "password": password,
+        },
+        if (email != null) ...{
+          "email": email,
+        },
+        if (mobilePhoneNumber != null) ...{
+          "mobilePhoneNumber": mobilePhoneNumber,
+        },
       };
 
   /// 注册

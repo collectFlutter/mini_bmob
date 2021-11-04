@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import '../type/date_time.dart';
 
-class WhereBuilder {
+class BmobWhereBuilder {
   final Map<String, dynamic> _whereMap = {};
   final List<Map<String, dynamic>> _or = [];
   final List<Map<String, dynamic>> _and = [];
@@ -42,7 +42,7 @@ class WhereBuilder {
   /// BQL查询
   // BmobBql? _bql;
 
-  WhereBuilder();
+  BmobWhereBuilder();
 
   /// 条件查询
   KeyBuilder<T> whereAdd<T>(String key) {
@@ -66,13 +66,13 @@ class WhereBuilder {
   }
 
   /// 排序字段
-  WhereBuilder order(List<String> _order) {
+  BmobWhereBuilder order(List<String> _order) {
     this._order = _order;
     return this;
   }
 
   /// 不查询具体数据，只统计
-  WhereBuilder noData() {
+  BmobWhereBuilder noData() {
     _limit = 0;
     return this;
   }
@@ -80,7 +80,7 @@ class WhereBuilder {
   /// 分页查询
   /// [pageIndex] - 页面
   /// [pageSize] - 每页数量,默认100，最大的默认值是100，企业pro版套餐的最大值为1000，其它版套餐的最大值为500
-  WhereBuilder page([int pageIndex = 1, int pageSize = 100]) {
+  BmobWhereBuilder page([int pageIndex = 1, int pageSize = 100]) {
     pageIndex = pageIndex < 1 ? 1 : pageIndex;
     _limit = pageSize;
     _skip = (pageIndex - 1) * pageSize;
@@ -88,7 +88,7 @@ class WhereBuilder {
   }
 
   /// 分组和计数
-  WhereBuilder groupBy(
+  BmobWhereBuilder groupBy(
       {List<String> fields = const [], bool groupCount = false}) {
     _groupBy
       ..clear()
@@ -98,7 +98,7 @@ class WhereBuilder {
   }
 
   /// 聚合-求和
-  WhereBuilder sum([List<String> fields = const []]) {
+  BmobWhereBuilder sum([List<String> fields = const []]) {
     _sum
       ..clear()
       ..addAll(fields);
@@ -106,7 +106,7 @@ class WhereBuilder {
   }
 
   /// 聚合-最小值
-  WhereBuilder min([List<String> fields = const []]) {
+  BmobWhereBuilder min([List<String> fields = const []]) {
     _min
       ..clear()
       ..addAll(fields);
@@ -114,7 +114,7 @@ class WhereBuilder {
   }
 
   /// 聚合-最大值
-  WhereBuilder max([List<String> fields = const []]) {
+  BmobWhereBuilder max([List<String> fields = const []]) {
     _max
       ..clear()
       ..addAll(fields);
@@ -122,7 +122,7 @@ class WhereBuilder {
   }
 
   /// 聚合-平均值
-  WhereBuilder average([List<String> fields = const []]) {
+  BmobWhereBuilder average([List<String> fields = const []]) {
     _average
       ..clear()
       ..addAll(fields);
@@ -130,7 +130,7 @@ class WhereBuilder {
   }
 
   /// 聚合-分组中的过滤条件
-  WhereBuilder having([Map<String, dynamic> having = const {}]) {
+  BmobWhereBuilder having([Map<String, dynamic> having = const {}]) {
     _having
       ..clear()
       ..addAll(having);
@@ -138,7 +138,7 @@ class WhereBuilder {
   }
 
   /// 查询指定列
-  WhereBuilder keys([List<String> keys = const []]) {
+  BmobWhereBuilder keys([List<String> keys = const []]) {
     _keys
       ..clear()
       ..addAll(keys);
@@ -152,7 +152,7 @@ class WhereBuilder {
   // }
 
   /// 一处where中的字段条件
-  WhereBuilder removeWhere(String key) {
+  BmobWhereBuilder removeWhere(String key) {
     if (_whereMap.containsKey(key)) {
       _whereMap.remove(key);
     }
@@ -160,13 +160,13 @@ class WhereBuilder {
   }
 
   /// 清空where条件
-  WhereBuilder clearWhere() {
+  BmobWhereBuilder clearWhere() {
     _whereMap.clear();
     return this;
   }
 
   /// 清空所有条件
-  WhereBuilder clear() {
+  BmobWhereBuilder clear() {
     _whereMap.clear();
     _or.clear();
     _and.clear();

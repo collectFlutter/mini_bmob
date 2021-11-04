@@ -1,9 +1,9 @@
-import 'package:mini_bmob/src/table/bmob_table.dart';
+import '../table/_table.dart';
 
-class Pointer<T extends BmobTable> {
+class BmobPointer<T extends BmobTable> {
   T? subSet;
 
-  Pointer(this.subSet);
+  BmobPointer(this.subSet);
 
   Map<String, dynamic> createJson() => {
         "__type": "Pointer",

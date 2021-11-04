@@ -1,19 +1,19 @@
-import 'package:mini_bmob/src/helper/bmon_net_helper.dart';
-import 'package:mini_bmob/src/table/bmob_table.dart';
-import 'package:mini_bmob/src/table/bmon_user_table.dart';
-import 'package:mini_bmob/src/type/relation.dart';
+import '../helper/net_helper.dart';
+import '../table/_table.dart';
+import '../table/user_table.dart';
+import '../type/relation.dart';
 
 class BmobRoleTable extends BmobTable {
   /// 角色名称必须限制为字母数字字符、破折号（-）和下划线(_)
   String? name;
-  Relation<BmobRoleTable, BmobUserTable>? _users;
+  BmobRelation<BmobRoleTable, BmobUserTable>? _users;
 
-  Relation<BmobRoleTable, BmobUserTable>? get users => _users;
+  BmobRelation<BmobRoleTable, BmobUserTable>? get users => _users;
 
   void setUsers(List<BmobUserTable> users) {
     assert(users.isEmpty || !users.any((element) => element.objectId == null));
     if (_users == null) {
-      _users = Relation(
+      _users = BmobRelation(
         this,
         BmobUserTable(),
         'users',
@@ -25,14 +25,14 @@ class BmobRoleTable extends BmobTable {
     }
   }
 
-  Relation<BmobRoleTable, BmobRoleTable>? _roles;
+  BmobRelation<BmobRoleTable, BmobRoleTable>? _roles;
 
-  Relation<BmobRoleTable, BmobRoleTable>? get roles => _roles;
+  BmobRelation<BmobRoleTable, BmobRoleTable>? get roles => _roles;
 
   void setRoles(List<BmobRoleTable> roles) {
     assert(roles.isEmpty || !roles.any((element) => element.objectId == null));
     if (_roles == null) {
-      _roles = Relation(
+      _roles = BmobRelation(
         this,
         BmobRoleTable(),
         'roles',
@@ -51,7 +51,7 @@ class BmobRoleTable extends BmobTable {
     assert(users.isEmpty || !users.any((element) => element.objectId == null));
     assert(roles.isEmpty || !roles.any((element) => element.objectId == null));
     if (users.isNotEmpty) {
-      _users = Relation(
+      _users = BmobRelation(
         this,
         BmobUserTable(),
         'users',
@@ -60,7 +60,7 @@ class BmobRoleTable extends BmobTable {
       );
     }
     if (roles.isNotEmpty) {
-      _roles = Relation(
+      _roles = BmobRelation(
         this,
         BmobRoleTable(),
         'roles',
@@ -74,13 +74,13 @@ class BmobRoleTable extends BmobTable {
   BmobRoleTable fromJson(Map<String, dynamic> json) {
     super.fromJson(json);
     name = json['name'];
-    _users = Relation(
+    _users = BmobRelation(
       this,
       BmobUserTable(),
       'users',
       (json) => BmobUserTable().fromJson(json),
     );
-    _roles = Relation(
+    _roles = BmobRelation(
       this,
       BmobRoleTable(),
       'roles',
@@ -91,6 +91,7 @@ class BmobRoleTable extends BmobTable {
 
   @override
   Map<String, dynamic> createJson() => {
+        ...super.createJson(),
         'name': Uri.encodeFull(name!),
         if (_users != null) ...{
           'users': _users!.createJson(),

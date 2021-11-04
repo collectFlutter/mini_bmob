@@ -1,11 +1,12 @@
 library mini_bmob;
 
-export 'src/bmon_config.dart';
+export 'src/config.dart';
 export 'src/helper/query_helper.dart';
 export 'src/helper/where_builder.dart';
-export 'src/table/bmob_role_table.dart';
-export 'src/table/bmob_table.dart';
-export 'src/table/bmon_user_table.dart';
+export 'src/table/role_table.dart';
+export 'src/table/_table.dart';
+export 'src/table/user_table.dart';
+export 'src/type/acl.dart';
 export 'src/type/array.dart';
 export 'src/type/batch.dart';
 export 'src/type/date_time.dart';

@@ -1,15 +1,15 @@
 import 'package:mini_bmob/mini_bmob.dart';
-import 'package:mini_bmob/src/helper/query_helper.dart';
-import 'package:mini_bmob/src/table/bmob_table.dart';
+import '../helper/query_helper.dart';
+import '../table/_table.dart';
 
-class Batch {
+class BmobBatch {
   final List<Map<String, dynamic>> _requests = [];
 
   List<Map<String, dynamic>> get request => _requests;
 
-  Batch();
+  BmobBatch();
 
-  Batch create<T extends BmobTable>(T table) {
+  BmobBatch create<T extends BmobTable>(T table) {
     _requests.add({
       "method": "POST",
       "path": "/1/classes/${table.getBmobTabName()}",
@@ -18,14 +18,14 @@ class Batch {
     return this;
   }
 
-  Batch createAll<T extends BmobTable>(List<T> tables) {
+  BmobBatch createAll<T extends BmobTable>(List<T> tables) {
     for (var table in tables) {
       create(table);
     }
     return this;
   }
 
-  Batch update<T extends BmobTable>(T table, {Map<String, dynamic>? body}) {
+  BmobBatch update<T extends BmobTable>(T table, {Map<String, dynamic>? body}) {
     assert(table.objectId != null);
     _requests.add({
       "method": "PUT",
@@ -38,7 +38,7 @@ class Batch {
     return this;
   }
 
-  Batch updateAll<T extends BmobTable>(List<T> tables,
+  BmobBatch updateAll<T extends BmobTable>(List<T> tables,
       {Map<String, dynamic>? body}) {
     for (var table in tables) {
       update(table, body: body);
@@ -46,7 +46,7 @@ class Batch {
     return this;
   }
 
-  Batch delete<T extends BmobTable>(T table) {
+  BmobBatch delete<T extends BmobTable>(T table) {
     assert(table.objectId != null);
     _requests.add({
       "method": "DELETE",
@@ -58,7 +58,7 @@ class Batch {
     return this;
   }
 
-  Batch deleteAll<T extends BmobTable>(List<T> tables) {
+  BmobBatch deleteAll<T extends BmobTable>(List<T> tables) {
     for (var table in tables) {
       delete(table);
     }
@@ -66,5 +66,5 @@ class Batch {
   }
 
   /// 批量操作的上限为50个，会分组进行上传
-  Future<List> post() => QueryHelper.batch(this);
+  Future<List> post() => BmobQueryHelper.batch(this);
 }

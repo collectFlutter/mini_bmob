@@ -1,27 +1,27 @@
 import 'dart:convert';
 
 import 'package:mini_bmob/mini_bmob.dart';
-import 'package:mini_bmob/src/helper/bmon_net_helper.dart';
-import 'package:mini_bmob/src/type/batch.dart';
-import 'package:mini_bmob/src/type/response_list.dart';
+import '../helper/net_helper.dart';
+import '../type/batch.dart';
+import '../type/response_list.dart';
 
-import '../table/bmob_table.dart';
+import '../table/_table.dart';
 
-class QueryHelper {
+class BmobQueryHelper {
   /// 查询列表
-  static Future<ResponseList<T>> list<T extends BmobTable>(
+  static Future<BmobSetResponse<T>> list<T extends BmobTable>(
     T table,
     JsonToTable<T> jsonToTable, {
-    WhereBuilder? where,
+    BmobWhereBuilder? where,
   }) async {
     var data = await BmobNetHelper.init().get(
       '/1/classes/${table.getBmobTabName()}',
       body: where?.builder(),
     );
     if (data == null || !data.containsKey('results')) {
-      return ResponseList<T>.empty();
+      return BmobSetResponse<T>.empty();
     }
-    return ResponseList<T>.fromJson(data, jsonToTable);
+    return BmobSetResponse<T>.fromJson(data, jsonToTable);
   }
 
   /// 查询列表
@@ -38,7 +38,7 @@ class QueryHelper {
   }
 
   /// 批量操作的上限为50个，会分组进行上传
-  static Future<List> batch(Batch batch) async {
+  static Future<List> batch(BmobBatch batch) async {
     List _list = [];
     var list = batch.request;
     int quotient = list.length ~/ 50;

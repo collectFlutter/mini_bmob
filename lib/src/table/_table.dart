@@ -1,4 +1,8 @@
-import 'package:mini_bmob/src/helper/bmon_net_helper.dart';
+import 'dart:convert';
+
+import '../type/acl.dart';
+
+import '../helper/net_helper.dart';
 
 abstract class BmobTable {
   /// 数据表名称
@@ -7,15 +11,27 @@ abstract class BmobTable {
   String? createdAt;
   String? updatedAt;
   String? objectId;
+  late BmobACL acl;
 
-  Map<String, dynamic> createJson();
+  Map<String, dynamic> createJson() => {
+        if (acl.toJson().isNotEmpty) ...{
+          'ACL': acl.toJson(),
+        }
+      };
 
-  BmobTable();
+  BmobTable() {
+    acl = BmobACL();
+  }
 
   BmobTable fromJson(Map<String, dynamic> json) {
     objectId = json['objectId'];
     createdAt = json['createdAt'];
     updatedAt = json['updatedAt'];
+    if (json.containsKey('ACL')) {
+      acl = BmobACL(json['ACL']);
+    } else {
+      acl = BmobACL();
+    }
     return this;
   }
 
@@ -91,5 +107,6 @@ abstract class BmobTable {
         'objectId': objectId,
         'createdAt': createdAt,
         'updatedAt': updatedAt,
+        'ACL': acl.toJson(),
       };
 }
