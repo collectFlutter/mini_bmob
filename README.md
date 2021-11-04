@@ -1,4 +1,6 @@
 ## mini_bmob
+[![](https://img.shields.io/pub/v/mini_calendar#align=left&display=inline&height=20&originHeight=20&originWidth=76&status=done&style=none&width=76)](https://pub.flutter-io.cn/packages/mini_bmob) ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/collectFlutter/mini_bmob?style=plastic)
+
 
 Bmob API 接口封装，包含加密传输，包含用户管理、ACL和角色、地理位置、条件查询、数据关联、数组、对象操作。
 
