@@ -71,8 +71,10 @@ class BmobUserTable extends BmobTable {
         data.containsKey('createdAt') &&
         data.containsKey('objectId')) {
       fromJson(data);
+      BmobConfig.config.sessionToken = sessionToken;
       return true;
     }
+    BmobConfig.config.sessionToken = null;
     return false;
   }
 
@@ -81,8 +83,7 @@ class BmobUserTable extends BmobTable {
     if (objectId == null || sessionToken == null) {
       throw Exception('objectId or sessionToken is null');
     }
-    var data = await BmobNetHelper.init()
-        .get('/1/checkSession/$objectId', session: sessionToken);
+    var data = await BmobNetHelper.init().get('/1/checkSession/$objectId');
     return data != null && data.containsKey('msg') && data['msg'] == 'ok';
   }
 
@@ -102,8 +103,7 @@ class BmobUserTable extends BmobTable {
   @override
   Future<bool> delete() async {
     if (objectId == null) throw Exception('objectId is null');
-    var data = await BmobNetHelper.init()
-        .delete('/1/user/$objectId', session: sessionToken);
+    var data = await BmobNetHelper.init().delete('/1/user/$objectId');
     return data != null && data.containsKey('msg') && data['msg'] == 'ok';
   }
 
@@ -113,8 +113,7 @@ class BmobUserTable extends BmobTable {
       throw Exception('objectId or sessionToken is null');
     }
     var data = await BmobNetHelper.init().put('/1/updateUserPassword/$objectId',
-        body: {"oldPassword": oldPwd, "newPassword": newPwd},
-        session: sessionToken);
+        body: {"oldPassword": oldPwd, "newPassword": newPwd});
     if (data != null && data.containsKey('msg') && data['msg'] == 'ok') {
       password = newPwd;
       return true;
@@ -130,7 +129,6 @@ class BmobUserTable extends BmobTable {
     var data = await BmobNetHelper.init().put(
       '/1/users/$objectId',
       body: body ?? createJson(),
-      session: sessionToken,
     );
     if (data != null && data.containsKey('updatedAt')) {
       updatedAt = data['updatedAt'];

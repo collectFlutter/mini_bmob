@@ -8,8 +8,15 @@ class WhereBuilder {
   final List<Map<String, dynamic>> _and = [];
   final List<String> _keys = [];
   late List<String> _order = [];
-  int? _count;
+
+  /// 是否返回查询结果总数
+  final bool _count = true;
+
+  /// 每页数量
   int? _limit;
+
+  /// 偏移量
+  int? _skip;
 
   /// 返回的列为 _avg+首字母大写的列名 ，有
   final List<String> _groupBy = [];
@@ -64,11 +71,19 @@ class WhereBuilder {
     return this;
   }
 
-  /// 查询结果计数,可用于分页参数，不为空时，返回统计总数.
-  /// 如果有一个非0的limit的话，既会返回正确的results也会返回count的值。
-  WhereBuilder count([int? count, int? limit]) {
-    _count = count;
-    _limit = limit;
+  /// 不查询具体数据，只统计
+  WhereBuilder noData() {
+    _limit = 0;
+    return this;
+  }
+
+  /// 分页查询
+  /// [pageIndex] - 页面
+  /// [pageSize] - 每页数量,默认100，最大的默认值是100，企业pro版套餐的最大值为1000，其它版套餐的最大值为500
+  WhereBuilder page([int pageIndex = 1, int pageSize = 100]) {
+    pageIndex = pageIndex < 1 ? 1 : pageIndex;
+    _limit = pageSize;
+    _skip = (pageIndex - 1) * pageSize;
     return this;
   }
 
@@ -162,8 +177,8 @@ class WhereBuilder {
     _sum.clear();
     _max.clear();
     _min.clear();
-    _count = null;
     _limit = null;
+    _skip = null;
     _having.clear();
     _order.clear();
     return this;
@@ -191,6 +206,7 @@ class WhereBuilder {
     }
 
     return {
+      'count': true,
       if (_where.isNotEmpty) ...{'where': jsonEncode(_where)},
       if (_groupCount) ...{'groupcount': _groupCount},
       if (_groupBy.isNotEmpty) ...{'groupby': _groupBy.join(',')},
@@ -201,9 +217,8 @@ class WhereBuilder {
       if (_having.isNotEmpty) ...{'having': jsonEncode(_having)},
       if (_order.isNotEmpty) ...{'order': _order.join(',')},
       if (_keys.isNotEmpty) ...{'keys': _keys.join(',')},
-      if (_count != null) ...{'count': _count},
       if (_limit != null) ...{'limit': _limit},
-      // if (_bql != null) ..._bql!.toJson()
+      if (_skip != null) ...{'skip': _skip},
     };
   }
 }
@@ -305,9 +320,9 @@ class KeyBuilder<T> {
     return this;
   }
 
-  /// $regex	匹配PCRE表达式
+  /// $regex	匹配PCRE表达式,模糊查询只对付费用户开放，付费后可直接使用。
   KeyBuilder<T> regex(String regex) {
-    _json['\$nin'] = regex;
+    _json['\$regex'] = regex;
     return this;
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:mini_bmob/mini_bmob.dart';
 import 'package:mini_bmob/src/helper/bmon_net_helper.dart';
 import 'package:mini_bmob/src/type/batch.dart';
@@ -35,21 +37,22 @@ class QueryHelper {
     return data?['results'] ?? [];
   }
 
-  /// 批量操作
-  static Future batch(Batch batch) async {
-    /// 批量操作的上限为50个，所以要做分组
+  /// 批量操作的上限为50个，会分组进行上传
+  static Future<List> batch(Batch batch) async {
+    List _list = [];
     var list = batch.request;
     int quotient = list.length ~/ 50;
     for (int i = 0; i < quotient; i++) {
-      await _batch(list.sublist(i * 50, i * 50 + 50));
+      _list.addAll(await _batch(list.sublist(i * 50, i * 50 + 50)));
     }
     int remainder = list.length % 50;
     if (remainder > 0) {
-      await _batch(list.sublist(list.length - remainder));
+      _list.addAll(await _batch(list.sublist(list.length - remainder)));
     }
+    return _list;
   }
 
-  static Future<dynamic> _batch(List<Map<String, dynamic>> request) async {
+  static Future<List> _batch(List<Map<String, dynamic>> request) async {
     assert(request.length < 51);
     var data = await BmobNetHelper.init()
         .post('/1/batch', body: {'requests': request});

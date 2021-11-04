@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:mini_bmob/mini_bmob.dart';
@@ -63,21 +65,21 @@ void main() {
 
   group('Role Test', () {
     test('Role Install', () async {
-      BmobRoleTable r1 = BmobRoleTable(name: 'Developer');
+      BmobRoleTable r1 = BmobRoleTable(name: 'Developer2');
       var flag = await r1.install();
       expect(flag, true);
-      BmobRoleTable r2 = BmobRoleTable(name: 'Maintain');
+      BmobRoleTable r2 = BmobRoleTable(name: 'Maintain2');
       flag = await r2.install();
       expect(flag, true);
-      BmobRoleTable r3 = BmobRoleTable(name: 'Test');
+      BmobRoleTable r3 = BmobRoleTable(name: 'Test2');
       flag = await r3.install();
       expect(flag, true);
-      BmobRoleTable r4 = BmobRoleTable(name: 'Operate');
+      BmobRoleTable r4 = BmobRoleTable(name: 'Operate2');
       flag = await r4.install();
       expect(flag, true);
-      BmobRoleTable r = BmobRoleTable(name: 'Admin', roles: [r1, r2, r3]);
-      flag = await r.install();
-      expect(flag, true);
+      // BmobRoleTable r = BmobRoleTable(name: 'Admin', roles: [r1, r2, r3]);
+      // flag = await r.install();
+      // expect(flag, true);
     });
 
     test('Role Remove Users', () async {
@@ -115,6 +117,56 @@ void main() {
       flag = await admin.getInfo();
       expect(flag, true);
       L.i(admin.toJson());
+    });
+  });
+
+  group('Batch Test', () {
+    test('batch delete', () async {
+      WhereBuilder _where = WhereBuilder();
+      _where.whereAdd('nationality').contain(['中国']);
+      ResponseList<AuthorTable> _list = await QueryHelper.list(
+        AuthorTable(),
+        (json) => AuthorTable().fromJson(json),
+        where: _where,
+      );
+      Batch batch = Batch();
+      for (var element in _list.results) {
+        batch.delete(element);
+      }
+      L.i(batch.request);
+      var data = await batch.post();
+      L.i(data);
+    });
+
+    test('batch update', () async {
+      WhereBuilder _where = WhereBuilder();
+      _where.whereAdd('nationality').contain(['China']);
+      _where.page(1, 10);
+      ResponseList<AuthorTable> _list = await QueryHelper.list(
+        AuthorTable(),
+        (json) => AuthorTable().fromJson(json),
+        where: _where,
+      );
+      Batch batch = Batch();
+      batch.updateAll(_list.results, body: {'nationality': '中国'});
+      L.i(batch.request);
+      var date = await batch.post();
+      L.i(date);
+    });
+
+    test('batch create', () async {
+      List<AuthorTable> authors = List.generate(
+        100,
+        (index) => AuthorTable(name: 'JsonYe${index + 1}', nationality: '中国'),
+      );
+      Batch batch = Batch();
+      for (var element in authors) {
+        batch.create(element);
+      }
+      L.i(jsonEncode(batch.request));
+
+      var data = await batch.post();
+      L.i(data);
     });
   });
 
@@ -182,6 +234,62 @@ void main() {
   });
 
   group('QueryHelper Test', () {
-    test('Batch Query', () {});
+    test('batch test', () async {
+      Batch batch = Batch();
+      batch.request.addAll([
+        {
+          "method": "POST",
+          "path": "/1/classes/author",
+          "body": {"name": "JsonYe1", "nationality": "中国"}
+        },
+        {
+          "method": "POST",
+          "path": "/1/classes/author",
+          "body": {"name": "JsonYe2", "nationality": "中国"}
+        },
+        {
+          "method": "POST",
+          "path": "/1/classes/author",
+          "body": {"name": "JsonYe3", "nationality": "中国"}
+        },
+        {
+          "method": "POST",
+          "path": "/1/classes/author",
+          "body": {"name": "JsonYe4", "nationality": "中国"}
+        },
+        {
+          "method": "POST",
+          "path": "/1/classes/author",
+          "body": {"name": "JsonYe5", "nationality": "中国"}
+        },
+        {
+          "method": "POST",
+          "path": "/1/classes/author",
+          "body": {"name": "JsonYe6", "nationality": "中国"}
+        },
+        {
+          "method": "POST",
+          "path": "/1/classes/author",
+          "body": {"name": "JsonYe7", "nationality": "中国"}
+        },
+        {
+          "method": "POST",
+          "path": "/1/classes/author",
+          "body": {"name": "JsonYe8", "nationality": "中国"}
+        },
+        {
+          "method": "POST",
+          "path": "/1/classes/author",
+          "body": {"name": "JsonYe9", "nationality": "中国"}
+        },
+        {
+          "method": "POST",
+          "path": "/1/classes/author",
+          "body": {"name": "JsonYe10", "nationality": "中国"}
+        }
+      ]);
+      L.i(jsonEncode(batch.request));
+      await QueryHelper.batch(batch);
+    });
   });
 }

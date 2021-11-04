@@ -15,11 +15,10 @@ class BmobNetHelper {
     Map<String, dynamic>? body,
     cancelToken,
     Map<String, dynamic> extra = const {},
-    String? session,
   }) async {
     NetManager manager = NetManager.internal(
       baseUrl: _config.host,
-      headers: _config.getHeaders(session: session, url: path),
+      headers: _config.getHeaders(url: path),
       connectTimeout: 5000,
       interceptors: [
         MiniLogInterceptor(
@@ -37,16 +36,15 @@ class BmobNetHelper {
     return response.response?.data;
   }
 
-  Future<Map<String, dynamic>?> post(
+  Future<dynamic> post(
     path, {
     Map<String, dynamic>? body,
     cancelToken,
     Map<String, dynamic> extra = const {},
-    String? session,
   }) async {
     NetManager manager = NetManager.internal(
       baseUrl: _config.host,
-      headers: _config.getHeaders(session: session, url: path),
+      headers: _config.getHeaders(url: path),
       connectTimeout: 5000,
       interceptors: [
         MiniLogInterceptor(
@@ -69,11 +67,10 @@ class BmobNetHelper {
     Map<String, dynamic>? body,
     cancelToken,
     Map<String, dynamic> extra = const {},
-    String? session,
   }) async {
     NetManager manager = NetManager.internal(
       baseUrl: _config.host,
-      headers: _config.getHeaders(session: session, url: path),
+      headers: _config.getHeaders(url: path),
       connectTimeout: 5000,
       interceptors: [
         MiniLogInterceptor(
@@ -96,11 +93,10 @@ class BmobNetHelper {
     Map<String, dynamic>? body,
     cancelToken,
     Map<String, dynamic> extra = const {},
-    String? session,
   }) async {
     NetManager manager = NetManager.internal(
       baseUrl: _config.host,
-      headers: _config.getHeaders(session: session, url: path),
+      headers: _config.getHeaders(url: path),
       connectTimeout: 5000,
       interceptors: [
         MiniLogInterceptor(

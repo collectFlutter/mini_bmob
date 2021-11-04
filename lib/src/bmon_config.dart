@@ -51,6 +51,9 @@ class BmobConfig {
   /// 打印请求正确日志
   final LogCallback printResponse;
 
+  /// 用户登陆的token
+  String? sessionToken;
+
   BmobConfig._(
     this._host,
     this._apiKey,
@@ -122,7 +125,7 @@ class BmobConfig {
     );
   }
 
-  Map<String, dynamic> getHeaders({String? session, String? url}) {
+  Map<String, dynamic> getHeaders({String? url}) {
     if (_safeRequest) {
       assert(url != null && _secretKey != null);
       int timeStamp = DateTime.now().millisecondsSinceEpoch ~/ 1000;
@@ -136,8 +139,8 @@ class BmobConfig {
         'X-Bmob-Noncestr-Key': nonceStr,
         'X-Bmob-Secret-Key': _secretKey,
         'X-Bmob-Safe-Sign': sign,
-        if (session != null) ...{
-          "X-Bmob-Session-Token": session,
+        if (sessionToken != null) ...{
+          "X-Bmob-Session-Token": sessionToken,
         },
         if (_masterKey != null) ...{
           "X-Bmob-Master-Key": masterKey,
@@ -147,8 +150,8 @@ class BmobConfig {
     return {
       "X-Bmob-Application-Id": appId,
       "X-Bmob-REST-API-Key": apiKey,
-      if (session != null) ...{
-        "X-Bmob-Session-Token": session,
+      if (sessionToken != null) ...{
+        "X-Bmob-Session-Token": sessionToken,
       },
       if (_masterKey != null) ...{
         "X-Bmob-Master-Key": masterKey,
