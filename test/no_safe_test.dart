@@ -123,7 +123,7 @@ void main() {
   group('Batch Test', () {
     test('batch delete', () async {
       BmobWhereBuilder _where = BmobWhereBuilder();
-      _where.whereAdd('nationality').contain(['中国']);
+      _where.whereBasic('nationality').contain(['中国']);
       BmobSetResponse<AuthorTable> _list = await BmobQueryHelper.list(
         AuthorTable(),
         (json) => AuthorTable().fromJson(json),
@@ -140,7 +140,7 @@ void main() {
 
     test('batch update', () async {
       BmobWhereBuilder _where = BmobWhereBuilder();
-      _where.whereAdd('nationality').contain(['China']);
+      _where.whereBasic('nationality').contain(['China']);
       _where.page(1, 10);
       BmobSetResponse<AuthorTable> _list = await BmobQueryHelper.list(
         AuthorTable(),
@@ -199,6 +199,24 @@ void main() {
   });
 
   group('WhereBuilder Test', () {
+    test('位置查询', () {
+      BmobWhereBuilder geo = BmobWhereBuilder();
+      // geo
+      //     .whereGeoPoint('location')
+      //     .nearSphere(BmobGeoPoint(12, 34))
+      //     .maxDistanceInKilometers(1000);
+      geo
+          .orGeoPoint('location')
+          .nearSphere(BmobGeoPoint(22, 34))
+          .maxDistanceInKilometers(1000);
+      geo
+          .orGeoPoint('location')
+          .nearSphere(BmobGeoPoint(23, 34))
+          .maxDistanceInKilometers(1000);
+      L.i(jsonEncode(geo.builder()));
+      L.i(geo.builder());
+    });
+
     test("聚合查询", () {
       BmobWhereBuilder agr = BmobWhereBuilder();
       agr.max(['age', 'height']).min(['age', 'height']).average(
@@ -211,7 +229,7 @@ void main() {
     test('条件查询', () {
       BmobWhereBuilder where = BmobWhereBuilder();
       where
-          .whereAdd<int>('age')
+          .whereBasic<int>('age')
           .lt(100)
           .lte(100)
           .gt(20)
@@ -221,7 +239,7 @@ void main() {
           .ne(30)
           .all([20, 23, 12]);
       where
-          .whereAdd<DateTime>('birthday')
+          .whereBasic<DateTime>('birthday')
           .gte(DateTime.parse('2020-10-12 12:10:09'))
           .lte(DateTime(2021, 12, 13, 23, 12, 12));
       where.or<double>('width').gte(12.0).lte(34.9);

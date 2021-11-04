@@ -121,7 +121,7 @@ void main() {
     test('条件查询', () {
       BmobWhereBuilder where = BmobWhereBuilder();
       where
-          .whereAdd<int>('age')
+          .whereBasic<int>('age')
           .lt(100)
           .lte(100)
           .gt(20)
@@ -131,7 +131,7 @@ void main() {
           .ne(30)
           .all([20, 23, 12]);
       where
-          .whereAdd<DateTime>('birthday')
+          .whereBasic<DateTime>('birthday')
           .gte(DateTime.parse('2020-10-12 12:10:09'))
           .lte(DateTime(2021, 12, 13, 23, 12, 12));
       where.or<double>('width').gte(12.0).lte(34.9);

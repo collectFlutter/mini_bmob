@@ -1,16 +1,18 @@
 import 'dart:convert';
 
+import 'package:mini_bmob/src/type/geo_point.dart';
+
 import '../type/date_time.dart';
 
 class BmobWhereBuilder {
-  final Map<String, dynamic> _whereMap = {};
-  final List<Map<String, dynamic>> _or = [];
-  final List<Map<String, dynamic>> _and = [];
+  final Map<String, dynamic> _whereBasic = {};
+  final Map<String, dynamic> _whereGeoPoint = {};
+  final List<Map<String, dynamic>> _orBasic = [];
+  final List<Map<String, dynamic>> _andBasic = [];
+  final List<Map<String, dynamic>> _orGeoPoint = [];
+  final List<Map<String, dynamic>> _andGeoPoint = [];
   final List<String> _keys = [];
   late List<String> _order = [];
-
-  /// 是否返回查询结果总数
-  final bool _count = true;
 
   /// 每页数量
   int? _limit;
@@ -39,30 +41,48 @@ class BmobWhereBuilder {
   /// having传的是和where类似的json字符串，但having只应该用于过滤分组查询得到的结果集，即having只应该包含结果集中的列名如 {"_sumScore":{"$gt":100}}
   final Map<String, dynamic> _having = {};
 
-  /// BQL查询
-  // BmobBql? _bql;
-
   BmobWhereBuilder();
 
-  /// 条件查询
-  KeyBuilder<T> whereAdd<T>(String key) {
-    if (_whereMap.containsKey(key)) {
-      return _whereMap[key];
+  /// 位置信息字段查询
+  GeoPointBuilder whereGeoPoint(String key) {
+    if (_whereGeoPoint.containsKey(key)) {
+      return _whereGeoPoint[key];
     }
-    _whereMap[key] = KeyBuilder<T>._();
-    return _whereMap[key];
+    _whereGeoPoint[key] = GeoPointBuilder._();
+    return _whereGeoPoint[key];
+  }
+
+  /// 条件查询-复合查询中的或查询
+  GeoPointBuilder orGeoPoint(String key) {
+    _orGeoPoint.add({key: GeoPointBuilder._()});
+    return _orGeoPoint.last[key];
+  }
+
+  /// 条件查询-复合查询中的与查询
+  GeoPointBuilder andGeoPoint(String key) {
+    _orGeoPoint.add({key: GeoPointBuilder._()});
+    return _orGeoPoint.last[key];
+  }
+
+  /// 基础数据类型查询，包含DateTime
+  KeyBuilder<T> whereBasic<T>(String key) {
+    if (_whereBasic.containsKey(key)) {
+      return _whereBasic[key];
+    }
+    _whereBasic[key] = KeyBuilder<T>._();
+    return _whereBasic[key];
   }
 
   /// 条件查询-复合查询中的或查询
   KeyBuilder<T> or<T>(String key) {
-    _or.add({key: KeyBuilder<T>._()});
-    return _or.last[key];
+    _orBasic.add({key: KeyBuilder<T>._()});
+    return _orBasic.last[key];
   }
 
   /// 条件查询-复合查询中的与查询
   KeyBuilder<T> and<T>(String key) {
-    _and.add({key: KeyBuilder<T>._()});
-    return _and.last[key];
+    _andBasic.add({key: KeyBuilder<T>._()});
+    return _andBasic.last[key];
   }
 
   /// 排序字段
@@ -145,31 +165,26 @@ class BmobWhereBuilder {
     return this;
   }
 
-  /// BQL 查询
-  // WhereBuilder bql([BmobBql? bql]) {
-  //   _bql = bql;
-  //   return this;
-  // }
-
   /// 一处where中的字段条件
   BmobWhereBuilder removeWhere(String key) {
-    if (_whereMap.containsKey(key)) {
-      _whereMap.remove(key);
+    if (_whereBasic.containsKey(key)) {
+      _whereBasic.remove(key);
     }
     return this;
   }
 
   /// 清空where条件
   BmobWhereBuilder clearWhere() {
-    _whereMap.clear();
+    _whereBasic.clear();
     return this;
   }
 
   /// 清空所有条件
   BmobWhereBuilder clear() {
-    _whereMap.clear();
-    _or.clear();
-    _and.clear();
+    _whereBasic.clear();
+    _whereGeoPoint.clear();
+    _orBasic.clear();
+    _andBasic.clear();
     _keys.clear();
     _groupCount = false;
     _groupBy.clear();
@@ -186,20 +201,27 @@ class BmobWhereBuilder {
 
   Map<String, dynamic> builder() {
     Map<String, dynamic> _where = {};
-    if (_whereMap.isNotEmpty) {
-      _where
-          .addAll({for (var key in _whereMap.keys) key: _whereMap[key]._json});
-    }
-    if (_or.isNotEmpty) {
+    _where.addAll(
+        {for (var key in _whereGeoPoint.keys) key: _whereGeoPoint[key]._json});
+    _where.addAll(
+        {for (var key in _whereBasic.keys) key: _whereBasic[key]._json});
+
+    if (_orBasic.isNotEmpty || _orGeoPoint.isNotEmpty) {
       var or = [];
-      for (var map in _or) {
+      for (var map in _orBasic) {
+        or.add({for (var key in map.keys) key: map[key]._json});
+      }
+      for (var map in _orGeoPoint) {
         or.add({for (var key in map.keys) key: map[key]._json});
       }
       _where['\$or'] = or;
     }
-    if (_and.isNotEmpty) {
+    if (_andBasic.isNotEmpty || _andGeoPoint.isNotEmpty) {
       var and = [];
-      for (var map in _and) {
+      for (var map in _andBasic) {
+        and.add({for (var key in map.keys) key: map[key]._json});
+      }
+      for (var map in _andGeoPoint) {
         and.add({for (var key in map.keys) key: map[key]._json});
       }
       _where['\$and'] = and;
@@ -323,6 +345,62 @@ class KeyBuilder<T> {
   /// $regex	匹配PCRE表达式,模糊查询只对付费用户开放，付费后可直接使用。
   KeyBuilder<T> regex(String regex) {
     _json['\$regex'] = regex;
+    return this;
+  }
+}
+
+class GeoPointBuilder {
+  final Map<String, dynamic> _json = {};
+
+  GeoPointBuilder._();
+
+  /// 查询的中心点
+  GeoPointBuilder nearSphere(BmobGeoPoint point) {
+    _json['\$nearSphere'] = point.toJson();
+    return this;
+  }
+
+  /// 距离中心点的最大距离
+  /// [miles] (英里)
+  GeoPointBuilder maxDistanceInMiles([double? miles]) {
+    if (miles != null && miles > 0) {
+      _json['\$maxDistanceInMiles'] = miles;
+    } else {
+      _json.remove('\$maxDistanceInMiles');
+    }
+    return this;
+  }
+
+  /// 距离中心点的最大距离
+  /// [kilometers] (公里)
+  GeoPointBuilder maxDistanceInKilometers([double? kilometers]) {
+    if (kilometers != null && kilometers > 0) {
+      _json['\$maxDistanceInKilometers'] = kilometers;
+    } else {
+      _json.remove("\$maxDistanceInKilometers");
+    }
+    return this;
+  }
+
+  /// 距离中心点的最大距离
+  /// [radians] (公里)
+  GeoPointBuilder maxDistanceInRadians([double? radians]) {
+    if (radians != null) {
+      _json['\$maxDistanceInRadians'] = radians;
+    } else {
+      _json.remove('\$maxDistanceInRadians');
+    }
+    return this;
+  }
+
+  /// 距离中心点的最大距离
+  /// [radians] (公里)
+  GeoPointBuilder withIn([List<BmobGeoPoint> box = const []]) {
+    if (box.isNotEmpty) {
+      _json['\$within'] = {"$box": box.map((e) => e.toJson()).toList()};
+    } else {
+      _json.remove('\$within');
+    }
     return this;
   }
 }
