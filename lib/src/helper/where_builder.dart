@@ -44,23 +44,23 @@ class BmobWhereBuilder {
   BmobWhereBuilder();
 
   /// 位置信息字段查询
-  GeoPointBuilder whereGeoPoint(String key) {
+  GeoPointBuilder whereGeoPoint(String key, BmobGeoPoint center) {
     if (_whereGeoPoint.containsKey(key)) {
       return _whereGeoPoint[key];
     }
-    _whereGeoPoint[key] = GeoPointBuilder._();
+    _whereGeoPoint[key] = GeoPointBuilder._(center);
     return _whereGeoPoint[key];
   }
 
   /// 条件查询-复合查询中的或查询
-  GeoPointBuilder orGeoPoint(String key) {
-    _orGeoPoint.add({key: GeoPointBuilder._()});
+  GeoPointBuilder orGeoPoint(String key, BmobGeoPoint center) {
+    _orGeoPoint.add({key: GeoPointBuilder._(center)});
     return _orGeoPoint.last[key];
   }
 
   /// 条件查询-复合查询中的与查询
-  GeoPointBuilder andGeoPoint(String key) {
-    _orGeoPoint.add({key: GeoPointBuilder._()});
+  GeoPointBuilder andGeoPoint(String key, BmobGeoPoint center) {
+    _orGeoPoint.add({key: GeoPointBuilder._(center)});
     return _orGeoPoint.last[key];
   }
 
@@ -352,13 +352,15 @@ class KeyBuilder<T> {
 class GeoPointBuilder {
   final Map<String, dynamic> _json = {};
 
-  GeoPointBuilder._();
-
-  /// 查询的中心点
-  GeoPointBuilder nearSphere(BmobGeoPoint point) {
+  GeoPointBuilder._(BmobGeoPoint point) {
     _json['\$nearSphere'] = point.toJson();
-    return this;
   }
+
+  // /// 查询的中心点
+  // GeoPointBuilder nearSphere(BmobGeoPoint point) {
+  //   _json['\$nearSphere'] = point.toJson();
+  //   return this;
+  // }
 
   /// 距离中心点的最大距离
   /// [miles] (英里)

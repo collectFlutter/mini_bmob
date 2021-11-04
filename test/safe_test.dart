@@ -12,6 +12,7 @@ import 'config.dart';
 void main() {
   BmobConfig.initSafe(secretKey,
       masterKey: masterKey,
+      safeToken: 'JsonYe-',
       printError: (object, extra) => L.e(object),
       printResponse: (object, extra) => L.d(object));
 

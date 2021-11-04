@@ -201,17 +201,14 @@ void main() {
   group('WhereBuilder Test', () {
     test('位置查询', () {
       BmobWhereBuilder geo = BmobWhereBuilder();
-      // geo
-      //     .whereGeoPoint('location')
-      //     .nearSphere(BmobGeoPoint(12, 34))
-      //     .maxDistanceInKilometers(1000);
       geo
-          .orGeoPoint('location')
-          .nearSphere(BmobGeoPoint(22, 34))
+          .whereGeoPoint('location', BmobGeoPoint(37.423112, 114.123412))
           .maxDistanceInKilometers(1000);
       geo
-          .orGeoPoint('location')
-          .nearSphere(BmobGeoPoint(23, 34))
+          .orGeoPoint('location', BmobGeoPoint(37.423112, 114.123412))
+          .maxDistanceInKilometers(1000);
+      geo
+          .andGeoPoint('location', BmobGeoPoint(37.123421, 114.124412))
           .maxDistanceInKilometers(1000);
       L.i(jsonEncode(geo.builder()));
       L.i(geo.builder());
@@ -219,10 +216,10 @@ void main() {
 
     test("聚合查询", () {
       BmobWhereBuilder agr = BmobWhereBuilder();
-      agr.max(['age', 'height']).min(['age', 'height']).average(
-          ['age', 'height']).sum(['age']).groupBy(fields: [
-        'sex'
-      ], groupCount: true).order(['-age']);
+      agr.max(['age', 'height']).min(['age', 'height']).average([
+        'age',
+        'height'
+      ]).sum(['age']).groupBy(fields: ['sex'], groupCount: true);
       L.i(agr.builder());
     });
 
@@ -247,6 +244,18 @@ void main() {
       where.and<double>('width').gte(13.0).lte(34.9);
       where.and<double>('width').gte(13.0).lte(34.9);
       where.order(['-birthday', 'age']);
+      L.i(where.builder());
+    });
+
+    test('分页查询', () {
+      BmobWhereBuilder where = BmobWhereBuilder();
+      where.page(1, 20);
+      L.i(where.builder());
+    });
+
+    test('字段过滤', () {
+      BmobWhereBuilder where = BmobWhereBuilder();
+      where.keys(['name', 'age']);
       L.i(where.builder());
     });
   });
