@@ -64,6 +64,7 @@ class BmobConfig {
     this.printResponse = _printLog,
     bool safeRequest = false,
     String? safeToken,
+    this.sessionToken,
   }) {
     _safeRequest = safeRequest;
     _safeToken = safeToken;
@@ -77,10 +78,11 @@ class BmobConfig {
   /// - [printError] 打印错误请求日志
   /// - [printResponse] 打印正常日志
   static void initSafe(
-    String secretKey, {
+    String secretKey,
+    String safeToken, {
     String host = "https://api2.bmob.cn",
-    String? safeToken = 'JsonYe-',
     String? masterKey,
+    String? sessionToken,
     printError,
     printResponse,
   }) {
@@ -94,6 +96,7 @@ class BmobConfig {
       printResponse: printResponse,
       safeRequest: true,
       safeToken: safeToken,
+      sessionToken: sessionToken,
     );
   }
 
@@ -109,6 +112,7 @@ class BmobConfig {
     String apiKey, {
     String host = "https://api2.bmob.cn",
     String? masterKey,
+    String? sessionToken,
     printError,
     printResponse,
   }) {
@@ -122,6 +126,7 @@ class BmobConfig {
       printResponse: printResponse,
       safeRequest: false,
       safeToken: null,
+      sessionToken: sessionToken,
     );
   }
 

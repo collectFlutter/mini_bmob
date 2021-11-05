@@ -1,6 +1,6 @@
 name: mini_bmob
-description: Bmob API interface encapsulation supports encrypted transmission, including user management, ACL and role, geographic location, condition query, data association, array, object operation and other module functions
-version: 0.1.0
+description: Bmob API interface encapsulation supports signature, user, ACL and role, location, data association, object, query, etc
+version: 0.1.1
 homepage: https://github.com/collectFlutter/mini_bmob
 
 environment:

@@ -10,11 +10,13 @@ import 'config.dart';
 
 // 加密请求
 void main() {
-  BmobConfig.initSafe(secretKey,
-      masterKey: masterKey,
-      safeToken: 'JsonYe-',
-      printError: (object, extra) => L.e(object),
-      printResponse: (object, extra) => L.d(object));
+  BmobConfig.initSafe(
+    secretKey,
+    'JsonYe-',
+    masterKey: masterKey,
+    printError: (object, extra) => L.e(object),
+    printResponse: (object, extra) => L.d(object),
+  );
 
   group('User Test', () {
     BmobUserTable _user = BmobUserTable(username: 'Safe', password: '123456');
