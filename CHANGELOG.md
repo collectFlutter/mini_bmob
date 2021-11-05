@@ -1,3 +1,6 @@
+## 0.1.2
+add `BmobQueryHelper.query()`
+
 ## 0.1.1
 add example project. update Readme.
 

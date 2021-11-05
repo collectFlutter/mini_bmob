@@ -5,6 +5,8 @@ import '../type/pointer.dart';
 
 import '../helper/net_helper.dart';
 
+typedef JsonToObject<T> = T Function(Map<String, dynamic> json);
+
 typedef JsonToTable<T extends BmobTable> = T Function(
     Map<String, dynamic> json);
 

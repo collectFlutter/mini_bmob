@@ -1,6 +1,6 @@
-import 'dart:convert';
+import 'where_builder.dart';
+import '../type/relation.dart';
 
-import 'package:mini_bmob/mini_bmob.dart';
 import '../helper/net_helper.dart';
 import '../type/batch.dart';
 import '../type/response_list.dart';
@@ -8,7 +8,22 @@ import '../type/response_list.dart';
 import '../table/_table.dart';
 
 class BmobQueryHelper {
-  /// 查询列表
+  /// 适用于聚合查询，返回非表格字段
+  static Future<List<O>> query<T extends BmobTable, O>(
+      T table, JsonToObject<O> jsonToObject,
+      {BmobWhereBuilder? where}) async {
+    var data = await BmobNetHelper.init().get(
+      '/1/classes/${table.getBmobTabName()}',
+      body: where?.builder(),
+    );
+    if (data == null || !data.containsKey('results')) {
+      return [];
+    }
+    List list = data['results'];
+    return list.map((e) => jsonToObject(e)).toList();
+  }
+
+  /// 数据列表查询
   static Future<BmobSetResponse<T>> list<T extends BmobTable>(
     T table,
     JsonToTable<T> jsonToTable, {
