@@ -1,6 +1,8 @@
 class BmobDateTime {
   late DateTime _dateTime;
 
+  DateTime get dateTime => _dateTime;
+
   BmobDateTime(this._dateTime);
 
   factory BmobDateTime.fromJson(Map<String, dynamic> json) {
