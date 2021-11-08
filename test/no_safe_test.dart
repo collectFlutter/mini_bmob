@@ -31,13 +31,13 @@ void main() {
     test('User Login', () async {
       var flag = await _user.login();
       expect(flag, true);
-      _user.username = null;
-      flag = await _user.login();
-      expect(flag, true);
-      _user.username = null;
-      _user.email = null;
-      flag = await _user.login();
-      expect(flag, true);
+      // _user.username = null;
+      // flag = await _user.login();
+      // expect(flag, true);
+      // _user.username = null;
+      // _user.email = null;
+      // flag = await _user.login();
+      // expect(flag, true);
     });
 
     test('User Update', () async {
