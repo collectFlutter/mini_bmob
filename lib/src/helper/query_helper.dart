@@ -9,24 +9,24 @@ import '../table/_table.dart';
 
 class BmobQueryHelper {
   /// 适用于聚合查询，返回非表格字段
-  static Future<List<O>> query<T extends BmobTable, O>(
-      T table, JsonToObject<O> jsonToObject,
-      {BmobWhereBuilder? where}) async {
-    var data = await BmobNetHelper.init().get(
-      '/1/classes/${table.getBmobTabName()}',
-      body: where?.builder(),
-    );
-    if (data == null || !data.containsKey('results')) {
-      return [];
-    }
-    List list = data['results'];
-    return list.map((e) => jsonToObject(e)).toList();
-  }
+  // static Future<List<O>> query<T extends BmobTable, O>(
+  //     T table, JsonToObject<O> jsonToObject,
+  //     {BmobWhereBuilder? where}) async {
+  //   var data = await BmobNetHelper.init().get(
+  //     '/1/classes/${table.getBmobTabName()}',
+  //     body: where?.builder(),
+  //   );
+  //   if (data == null || !data.containsKey('results')) {
+  //     return [];
+  //   }
+  //   List list = data['results'];
+  //   return list.map((e) => jsonToObject(e)).toList();
+  // }
 
   /// 数据列表查询
-  static Future<BmobSetResponse<T>> list<T extends BmobTable>(
+  static Future<BmobSetResponse<O>> query<T extends BmobTable, O>(
     T table,
-    JsonToTable<T> jsonToTable, {
+    JsonToObject<O> jsonToObject, {
     BmobWhereBuilder? where,
   }) async {
     var data = await BmobNetHelper.init().get(
@@ -34,9 +34,9 @@ class BmobQueryHelper {
       body: where?.builder(),
     );
     if (data == null || !data.containsKey('results')) {
-      return BmobSetResponse<T>.empty();
+      return BmobSetResponse<O>.empty();
     }
-    return BmobSetResponse<T>.fromJson(data, jsonToTable);
+    return BmobSetResponse<O>.fromJson(data, jsonToObject);
   }
 
   /// 查询列表

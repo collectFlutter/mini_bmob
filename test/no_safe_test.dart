@@ -21,7 +21,7 @@ void main() {
 
   group('User Test', () {
     BmobUserTable _user =
-        BmobUserTable(username: 'JsonYe2', password: '123456');
+        BmobUserTable(username: '27017', password: 'admin123');
 
     test('User Install', () async {
       var flag = await _user.install();
@@ -124,7 +124,7 @@ void main() {
     test('batch delete', () async {
       BmobWhereBuilder _where = BmobWhereBuilder();
       _where.whereBasic('nationality').contain(['中国']);
-      BmobSetResponse<AuthorTable> _list = await BmobQueryHelper.list(
+      BmobSetResponse<AuthorTable> _list = await BmobQueryHelper.query(
         AuthorTable(),
         (json) => AuthorTable().fromJson(json),
         where: _where,
@@ -142,7 +142,7 @@ void main() {
       BmobWhereBuilder _where = BmobWhereBuilder();
       _where.whereBasic('nationality').contain(['China']);
       _where.page(1, 10);
-      BmobSetResponse<AuthorTable> _list = await BmobQueryHelper.list(
+      BmobSetResponse<AuthorTable> _list = await BmobQueryHelper.query(
         AuthorTable(),
         (json) => AuthorTable().fromJson(json),
         where: _where,

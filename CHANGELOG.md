@@ -1,3 +1,6 @@
+## 0.1.5
+merge `BmobQueryHelper.list()` method and `BmobQueryHelper.query()` method
+
 ## 0.1.4
 update mini_net
 
