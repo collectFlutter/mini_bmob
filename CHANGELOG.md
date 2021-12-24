@@ -1,3 +1,6 @@
+## 0.1.6
+add BuildTableWhere，equals
+
 ## 0.1.5
 merge `BmobQueryHelper.list()` method and `BmobQueryHelper.query()` method
 

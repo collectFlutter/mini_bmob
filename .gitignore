@@ -75,5 +75,5 @@ build/
 !**/ios/**/default.perspectivev3
 
 test/config.dart
-test/work_hour_test.dart
-test/work_hour/
+#test/work_hour_test.dart
+#test/work_hour/

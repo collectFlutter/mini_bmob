@@ -11,7 +11,7 @@ class BmobRoleTable extends BmobTable {
   BmobRelation<BmobRoleTable, BmobUserTable>? get users => _users;
 
   void setUsers(List<BmobUserTable> users) {
-    assert(users.isEmpty || !users.any((element) => element.objectId == null));
+    assert(users.isEmpty || !users.any((element) => element.objectId.isEmpty));
     if (_users == null) {
       _users = BmobRelation(
         this,
@@ -30,7 +30,7 @@ class BmobRoleTable extends BmobTable {
   BmobRelation<BmobRoleTable, BmobRoleTable>? get roles => _roles;
 
   void setRoles(List<BmobRoleTable> roles) {
-    assert(roles.isEmpty || !roles.any((element) => element.objectId == null));
+    assert(roles.isEmpty || !roles.any((element) => element.objectId.isEmpty));
     if (_roles == null) {
       _roles = BmobRelation(
         this,
@@ -48,8 +48,8 @@ class BmobRoleTable extends BmobTable {
       {this.name,
       List<BmobUserTable> users = const [],
       List<BmobRoleTable> roles = const []}) {
-    assert(users.isEmpty || !users.any((element) => element.objectId == null));
-    assert(roles.isEmpty || !roles.any((element) => element.objectId == null));
+    assert(users.isEmpty || !users.any((element) => element.objectId.isEmpty));
+    assert(roles.isEmpty || !roles.any((element) => element.objectId.isEmpty));
     if (users.isNotEmpty) {
       _users = BmobRelation(
         this,
@@ -123,7 +123,7 @@ class BmobRoleTable extends BmobTable {
   /// 获取信息
   @override
   Future<bool> getInfo({List<String> include = const []}) async {
-    if (objectId == null) throw Exception("objectId is null");
+    if (objectId.isEmpty) throw Exception("objectId is empty");
     var data = await BmobNetHelper.init().get('/1/roles/$objectId');
     if (data != null && data.containsKey('objectId')) {
       fromJson(data);
@@ -135,7 +135,7 @@ class BmobRoleTable extends BmobTable {
   /// 删除
   @override
   Future<bool> delete() async {
-    if (objectId == null) throw Exception('objectId is null');
+    if (objectId.isEmpty) throw Exception('objectId is empty');
     var data = await BmobNetHelper.init().delete('/1/roles/$objectId');
     return data != null && data.containsKey('msg') && data['msg'] == 'ok';
   }

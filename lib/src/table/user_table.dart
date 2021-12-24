@@ -1,17 +1,16 @@
-import 'package:mini_bmob/mini_bmob.dart';
-import '../table/_table.dart';
-
+import '../config.dart';
 import '../helper/net_helper.dart';
+import '_table.dart';
 
 class BmobUserTable extends BmobTable {
   /// 登陆后，返回的session
-  String? sessionToken;
+  String sessionToken;
 
   /// 用户名，不可重复
   String? username;
 
   /// 密码，登陆时必填
-  String? password;
+  String password;
 
   /// 邮箱，不可重复
   String? email;
@@ -21,9 +20,10 @@ class BmobUserTable extends BmobTable {
 
   BmobUserTable({
     this.username,
-    this.password,
+    this.password = '',
     this.email,
     this.mobilePhoneNumber,
+    this.sessionToken = '',
   });
 
   @override
@@ -48,7 +48,7 @@ class BmobUserTable extends BmobTable {
   Map<String, dynamic> createJson() => {
         ...super.createJson(),
         "username": username,
-        if (password != null) ...{
+        if (password.isNotEmpty) ...{
           "password": password,
         },
         if (email != null) ...{
@@ -96,8 +96,8 @@ class BmobUserTable extends BmobTable {
 
   /// 检查用户的登录是否过期
   Future<bool> checkSession() async {
-    if (objectId == null || sessionToken == null) {
-      throw Exception('objectId or sessionToken is null');
+    if (objectId.isEmpty || sessionToken.isEmpty) {
+      throw Exception('objectId or sessionToken is empty');
     }
     var data = await BmobNetHelper.init().get('/1/checkSession/$objectId');
     return data != null && data.containsKey('msg') && data['msg'] == 'ok';
@@ -106,7 +106,7 @@ class BmobUserTable extends BmobTable {
   /// 获取用户信息
   @override
   Future<bool> getInfo({List<String> include = const []}) async {
-    if (objectId == null) throw Exception("objectId is null");
+    if (objectId.isEmpty) throw Exception("objectId is empty");
     var data = await BmobNetHelper.init().get('/1/users/$objectId');
     if (data != null && data.containsKey('objectId')) {
       fromJson(data);
@@ -118,15 +118,15 @@ class BmobUserTable extends BmobTable {
   /// 删除自己的账户
   @override
   Future<bool> delete() async {
-    if (objectId == null) throw Exception('objectId is null');
+    if (objectId.isEmpty) throw Exception('objectId is empty');
     var data = await BmobNetHelper.init().delete('/1/user/$objectId');
     return data != null && data.containsKey('msg') && data['msg'] == 'ok';
   }
 
   /// 修改密码
   Future<bool> updatePassword(String oldPwd, String newPwd) async {
-    if (objectId == null || sessionToken == null) {
-      throw Exception('objectId or sessionToken is null');
+    if (objectId.isEmpty || sessionToken.isEmpty) {
+      throw Exception('objectId or sessionToken is empty');
     }
     var data = await BmobNetHelper.init().put('/1/updateUserPassword/$objectId',
         body: {"oldPassword": oldPwd, "newPassword": newPwd});
@@ -139,8 +139,8 @@ class BmobUserTable extends BmobTable {
 
   @override
   Future<bool> update([Map<String, dynamic>? body]) async {
-    if (objectId == null) {
-      throw Exception('objectId or sessionToken is null');
+    if (objectId.isEmpty) {
+      throw Exception('objectId  is empty');
     }
     var data = await BmobNetHelper.init().put(
       '/1/users/$objectId',

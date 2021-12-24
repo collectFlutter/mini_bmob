@@ -11,7 +11,7 @@ class UserTable extends BmobUserTable {
       String? mobilePhoneNumber})
       : super(
             username: username,
-            password: password,
+            password: password ?? '',
             email: email,
             mobilePhoneNumber: mobilePhoneNumber);
 

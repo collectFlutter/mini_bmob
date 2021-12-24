@@ -8,9 +8,9 @@ abstract class BmobTable {
   /// 数据表名称
   String getBmobTabName();
 
-  String? createdAt;
-  String? updatedAt;
-  String? objectId;
+  String createdAt;
+  String updatedAt;
+  String objectId;
   late BmobACL acl;
 
   Map<String, dynamic> createJson() => {
@@ -19,14 +19,14 @@ abstract class BmobTable {
         }
       };
 
-  BmobTable() {
+  BmobTable({this.createdAt = '', this.updatedAt = '', this.objectId = ''}) {
     acl = BmobACL();
   }
 
   BmobTable fromJson(Map<String, dynamic> json) {
-    objectId = json['objectId'];
-    createdAt = json['createdAt'];
-    updatedAt = json['updatedAt'];
+    objectId = json['objectId'] ?? '';
+    createdAt = json['createdAt'] ?? '';
+    updatedAt = json['updatedAt'] ?? '';
     if (json.containsKey('ACL')) {
       acl = BmobACL(json['ACL']);
     } else {
@@ -42,8 +42,8 @@ abstract class BmobTable {
     if (data != null &&
         data.containsKey('createdAt') &&
         data.containsKey('objectId')) {
-      createdAt = data['createdAt'];
-      objectId = data['objectId'];
+      createdAt = data['createdAt'] ?? '';
+      objectId = data['objectId'] ?? '';
       return true;
     }
     return false;
@@ -51,7 +51,7 @@ abstract class BmobTable {
 
   /// 更新某条记录
   Future<bool> update([Map<String, dynamic>? body]) async {
-    if (objectId == null) throw Exception('objectId is null');
+    if (objectId.isEmpty) throw Exception('objectId is empty');
     var data = await BmobNetHelper.init().put(
         '/1/classes/${getBmobTabName()}/$objectId',
         body: body ?? createJson());
@@ -65,7 +65,7 @@ abstract class BmobTable {
   /// 获取记录详情
   /// [include] 需要联合查询的字段名称及筛选的字段，多字段用｜隔开，例如 include = ["author[name|age]"]
   Future<bool> getInfo({List<String> include = const []}) async {
-    if (objectId == null) throw Exception('objectId is null');
+    if (objectId.isEmpty) throw Exception('objectId is empty');
     Map<String, String>? body;
     if (include.isNotEmpty) {
       body = {"include": include.join('.')};
@@ -81,7 +81,7 @@ abstract class BmobTable {
 
   /// 删除某条记录
   Future<bool> delete() async {
-    if (objectId == null) throw Exception('objectId is null');
+    if (objectId.isEmpty) throw Exception('objectId is empty');
     var data = await BmobNetHelper.init()
         .delete('/1/classes/${getBmobTabName()}/$objectId');
     return data != null && data.containsKey('msg') && data['msg'] == 'ok';
@@ -89,7 +89,7 @@ abstract class BmobTable {
 
   /// 删除某些字段内容
   Future<bool> deleteFieldValue(List<String> field) async {
-    if (objectId == null) throw Exception('objectId is null');
+    if (objectId.isEmpty) throw Exception('objectId is empty');
 
     var body = {
       for (var item in field) item: {"__op": "Delete"}

@@ -21,9 +21,9 @@ class BmobACL {
 
   /// 设置用户及其权限
   BmobACL user(BmobUserTable user, {bool read = false, bool write = false}) {
-    if (user.objectId == null) throw Exception('user objectId is null');
+    if (user.objectId.isEmpty) throw Exception('user objectId is empty');
     if (read || write) {
-      _acl[user.objectId!] = _createCAL(read, write);
+      _acl[user.objectId] = _createCAL(read, write);
     } else {
       _acl.remove(user.objectId);
     }
@@ -41,7 +41,7 @@ class BmobACL {
 
   /// 设置角色及其权限
   BmobACL role(BmobRoleTable role, {bool read = false, bool write = false}) {
-    if (role.objectId == null) throw Exception('role objectId is null');
+    if (role.objectId.isEmpty) throw Exception('role objectId is empty');
     if (role.name == null) throw Exception('role name is null');
     if (read || write) {
       _acl["${role.name}:${role.objectId}"] = _createCAL(read, write);

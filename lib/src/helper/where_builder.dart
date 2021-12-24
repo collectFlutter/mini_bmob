@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:mini_bmob/mini_bmob.dart';
+import 'package:mini_bmob/src/table/_table.dart';
 import 'package:mini_bmob/src/type/geo_point.dart';
 
 import '../type/date_time.dart';
@@ -7,10 +9,13 @@ import '../type/date_time.dart';
 class BmobWhereBuilder {
   final Map<String, dynamic> _whereBasic = {};
   final Map<String, dynamic> _whereGeoPoint = {};
+  final Map<String, dynamic> _whereTable = {};
   final List<Map<String, dynamic>> _orBasic = [];
   final List<Map<String, dynamic>> _andBasic = [];
   final List<Map<String, dynamic>> _orGeoPoint = [];
   final List<Map<String, dynamic>> _andGeoPoint = [];
+  final List<Map<String, dynamic>> _orTable = [];
+  final List<Map<String, dynamic>> _andTable = [];
   final List<String> _keys = [];
   late List<String> _order = [];
 
@@ -22,6 +27,9 @@ class BmobWhereBuilder {
 
   /// 返回的列为 _avg+首字母大写的列名 ，有
   final List<String> _groupBy = [];
+
+  /// 对于Pointer的统计，可以同时查询详情
+  final List<String> _include = [];
 
   /// 为true的情形下则返回_count
   bool _groupCount = false;
@@ -43,12 +51,31 @@ class BmobWhereBuilder {
 
   BmobWhereBuilder();
 
+  /// 对象查询
+  TableBuilder<T> whereTable<T extends BmobTable>(String key, T table) {
+    if (!_whereTable.containsKey(key)) {
+      _whereTable[key] = TableBuilder<T>._(table);
+    }
+    return _whereTable[key];
+  }
+
+  /// 条件查询-复合查询中的或查询
+  TableBuilder<T> orTable<T extends BmobTable>(String key, T table) {
+    _orTable.add({key: TableBuilder<T>._(table)});
+    return _orTable.last[key];
+  }
+
+  /// 条件查询-复合查询中的与查询
+  TableBuilder<T> andTable<T extends BmobTable>(String key, T table) {
+    _andTable.add({key: TableBuilder<T>._(table)});
+    return _andTable.last[key];
+  }
+
   /// 位置信息字段查询
   GeoPointBuilder whereGeoPoint(String key, BmobGeoPoint center) {
-    if (_whereGeoPoint.containsKey(key)) {
-      return _whereGeoPoint[key];
+    if (!_whereGeoPoint.containsKey(key)) {
+      _whereGeoPoint[key] = GeoPointBuilder._(center);
     }
-    _whereGeoPoint[key] = GeoPointBuilder._(center);
     return _whereGeoPoint[key];
   }
 
@@ -60,16 +87,15 @@ class BmobWhereBuilder {
 
   /// 条件查询-复合查询中的与查询
   GeoPointBuilder andGeoPoint(String key, BmobGeoPoint center) {
-    _orGeoPoint.add({key: GeoPointBuilder._(center)});
-    return _orGeoPoint.last[key];
+    _andGeoPoint.add({key: GeoPointBuilder._(center)});
+    return _andGeoPoint.last[key];
   }
 
   /// 基础数据类型查询，包含DateTime
   KeyBuilder<T> whereBasic<T>(String key) {
-    if (_whereBasic.containsKey(key)) {
-      return _whereBasic[key];
+    if (!_whereBasic.containsKey(key)) {
+      _whereBasic[key] = KeyBuilder<T>._();
     }
-    _whereBasic[key] = KeyBuilder<T>._();
     return _whereBasic[key];
   }
 
@@ -109,11 +135,26 @@ class BmobWhereBuilder {
 
   /// 分组和计数
   BmobWhereBuilder groupBy(
-      {List<String> fields = const [], bool groupCount = false}) {
+      {List<String> fields = const [],
+      bool groupCount = false,
+      bool include = false}) {
     _groupBy
       ..clear()
       ..addAll(fields);
     _groupCount = groupCount;
+    if (include) {
+      _include
+        ..clear()
+        ..addAll(fields);
+    }
+    return this;
+  }
+
+  /// 同时查询制定field的Pointer对象
+  BmobWhereBuilder include([List<String> fields = const []]) {
+    _include
+      ..clear()
+      ..addAll(fields);
     return this;
   }
 
@@ -202,27 +243,39 @@ class BmobWhereBuilder {
   Map<String, dynamic> builder() {
     Map<String, dynamic> _where = {};
     _where.addAll(
-        {for (var key in _whereGeoPoint.keys) key: _whereGeoPoint[key]._json});
-    _where.addAll(
-        {for (var key in _whereBasic.keys) key: _whereBasic[key]._json});
+        {for (var key in _whereTable.keys) key: _whereTable[key].value});
 
-    if (_orBasic.isNotEmpty || _orGeoPoint.isNotEmpty) {
+    _where.addAll(
+        {for (var key in _whereGeoPoint.keys) key: _whereGeoPoint[key].value});
+
+    _where.addAll(
+        {for (var key in _whereBasic.keys) key: _whereBasic[key].value});
+
+    if (_orBasic.isNotEmpty || _orGeoPoint.isNotEmpty || _orTable.isNotEmpty) {
       var or = [];
       for (var map in _orBasic) {
-        or.add({for (var key in map.keys) key: map[key]._json});
+        or.add({for (var key in map.keys) key: map[key].value});
       }
       for (var map in _orGeoPoint) {
-        or.add({for (var key in map.keys) key: map[key]._json});
+        or.add({for (var key in map.keys) key: map[key].value});
+      }
+      for (var map in _orTable) {
+        or.add({for (var key in map.keys) key: map[key].value});
       }
       _where['\$or'] = or;
     }
-    if (_andBasic.isNotEmpty || _andGeoPoint.isNotEmpty) {
+    if (_andBasic.isNotEmpty ||
+        _andGeoPoint.isNotEmpty ||
+        _andTable.isNotEmpty) {
       var and = [];
       for (var map in _andBasic) {
-        and.add({for (var key in map.keys) key: map[key]._json});
+        and.add({for (var key in map.keys) key: map[key].value});
       }
       for (var map in _andGeoPoint) {
-        and.add({for (var key in map.keys) key: map[key]._json});
+        and.add({for (var key in map.keys) key: map[key].value});
+      }
+      for (var map in _andTable) {
+        and.add({for (var key in map.keys) key: map[key].value});
       }
       _where['\$and'] = and;
     }
@@ -232,6 +285,7 @@ class BmobWhereBuilder {
       if (_where.isNotEmpty) ...{'where': jsonEncode(_where)},
       if (_groupCount) ...{'groupcount': _groupCount},
       if (_groupBy.isNotEmpty) ...{'groupby': _groupBy.join(',')},
+      if (_include.isNotEmpty) ...{'include': _include.join(',')},
       if (_sum.isNotEmpty) ...{'sum': _sum.join(',')},
       if (_min.isNotEmpty) ...{'min': _min.join(',')},
       if (_max.isNotEmpty) ...{'max': _max.join(',')},
@@ -245,10 +299,52 @@ class BmobWhereBuilder {
   }
 }
 
-class KeyBuilder<T> {
+class TableBuilder<T extends BmobTable> {
+  final T _t;
   final Map<String, dynamic> _json = {};
 
+  get value => _json;
+
+  TableBuilder._(this._t);
+
+  /// 包含，[where]-只取where
+  TableBuilder inQuery(BmobWhereBuilder where) {
+    assert(where._whereBasic.isNotEmpty);
+    _json['\$inQuery'] = {
+      'where': jsonDecode(where.builder()['where']),
+      'className': _t.getBmobTabName()
+    };
+    return this;
+  }
+
+  /// 不包含，[where]-只取where
+  TableBuilder notInQuery(BmobWhereBuilder where) {
+    assert(where._whereBasic.isNotEmpty);
+    _json['\$notInQuery'] = {
+      'where': jsonDecode(where.builder()['where']),
+      'className': _t.getBmobTabName()
+    };
+    return this;
+  }
+}
+
+class KeyBuilder<T> {
+  final Map<String, dynamic> _json = {};
+  String? _value;
+
+  get value => _value ?? _json;
+
   KeyBuilder._();
+
+  KeyBuilder<T> equals(T value) {
+    if (value is DateTime) {
+      lte(value);
+      gte(value);
+    } else {
+      _value = value.toString();
+    }
+    return this;
+  }
 
   ///$lt	小于
   KeyBuilder<T> lt(T value) {
@@ -352,15 +448,11 @@ class KeyBuilder<T> {
 class GeoPointBuilder {
   final Map<String, dynamic> _json = {};
 
+  get value => _json;
+
   GeoPointBuilder._(BmobGeoPoint point) {
     _json['\$nearSphere'] = point.toJson();
   }
-
-  // /// 查询的中心点
-  // GeoPointBuilder nearSphere(BmobGeoPoint point) {
-  //   _json['\$nearSphere'] = point.toJson();
-  //   return this;
-  // }
 
   /// 距离中心点的最大距离
   /// [miles] (英里)
