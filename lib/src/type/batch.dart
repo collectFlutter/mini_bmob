@@ -1,6 +1,4 @@
 import 'package:mini_bmob/mini_bmob.dart';
-import '../helper/query_helper.dart';
-import '../table/_table.dart';
 
 class BmobBatch {
   final List<Map<String, dynamic>> _requests = [];
@@ -26,7 +24,7 @@ class BmobBatch {
   }
 
   BmobBatch update<T extends BmobTable>(T table, {Map<String, dynamic>? body}) {
-    assert(table.objectId != null);
+    if (table.objectId.isEmpty) throw Exception('table objectId is empty');
     _requests.add({
       "method": "PUT",
       if (BmobConfig.config.sessionToken != null) ...{
@@ -47,7 +45,7 @@ class BmobBatch {
   }
 
   BmobBatch delete<T extends BmobTable>(T table) {
-    assert(table.objectId != null);
+    if (table.objectId.isEmpty) throw Exception('table objectId is empty');
     _requests.add({
       "method": "DELETE",
       if (BmobConfig.config.sessionToken != null) ...{

@@ -1,3 +1,6 @@
+## 0.1.7
+update relation include()
+
 ## 0.1.6
 add BuildTableWhere，equals
 

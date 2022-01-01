@@ -42,34 +42,44 @@ class BmobRelation<T extends BmobTable, S extends BmobTable> {
       };
 
   Future<bool> include() async {
-    if (object.objectId == null) throw Exception('objectId is null');
-    var data = await BmobNetHelper.init().get(
-      '/1/classes/${subset.getBmobTabName()}',
-      body: {
-        "where": jsonEncode({
-          "\$relatedTo": {
-            "object": {
-              "__type": "Pointer",
-              "className": object.getBmobTabName(),
-              "objectId": object.objectId,
-            },
-            "key": key,
-          }
-        })
-      },
-    );
-    if (data != null && data.containsKey('results')) {
-      List _list = data['results'];
-      list = _list.map((e) => jsonToTable(e)).toList();
-      return true;
-    }
+    if (object.objectId.isEmpty) throw Exception('object objectId is empty');
+    int page = 0, size = 500;
     list = [];
-    return false;
+    while (true) {
+      int _skip = size * (page++);
+      var data = await BmobNetHelper.init().get(
+        '/1/classes/${subset.getBmobTabName()}',
+        body: {
+          "where": jsonEncode({
+            "\$relatedTo": {
+              "object": {
+                "__type": "Pointer",
+                "className": object.getBmobTabName(),
+                "objectId": object.objectId,
+              },
+              "key": key,
+            }
+          }),
+          "limit": size,
+          "skip": _skip,
+        },
+      );
+      if (data != null && data.containsKey('results')) {
+        List _list = data['results'];
+        list.addAll(_list.map((e) => jsonToTable(e)).toList());
+        if (_list.length < size) {
+          break;
+        }
+      } else {
+        break;
+      }
+    }
+    return true;
   }
 
   /// 添加关联对象
   Future<bool> add([List<S> list = const []]) async {
-    if (object.objectId == null) throw Exception('objectId is null');
+    if (object.objectId.isEmpty) throw Exception('object objectId is empty');
     if (list.isEmpty) return true;
     var data = await BmobNetHelper.init().put(
       '/1/classes/${object.getBmobTabName()}/${object.objectId}',
@@ -88,7 +98,7 @@ class BmobRelation<T extends BmobTable, S extends BmobTable> {
 
   /// 移除关联对象
   Future<bool> remove([List<S> list = const []]) async {
-    if (object.objectId == null) throw Exception('objectId is null');
+    if (object.objectId.isEmpty) throw Exception('object objectId is empty');
     if (list.isEmpty) return true;
     var data = await BmobNetHelper.init().put(
       '/1/classes/${object.getBmobTabName()}/${object.objectId}',
@@ -105,7 +115,7 @@ class BmobRelation<T extends BmobTable, S extends BmobTable> {
 
   /// 清空关联对象
   Future<bool> clear() async {
-    if (object.objectId == null) throw Exception('objectId is null');
+    if (object.objectId.isEmpty) throw Exception('object objectId is empty');
     if (list.isEmpty) return true;
     var data = await BmobNetHelper.init().put(
       '/1/classes/${object.getBmobTabName()}/${object.objectId}',

@@ -16,7 +16,7 @@ class BmobPointer<T extends BmobTable> {
   }
 
   Future<bool> include() async {
-    if (subSet == null || subSet!.objectId == null) return false;
+    if (subSet == null || subSet!.objectId.isEmpty) return false;
     return subSet!.getInfo();
   }
 

@@ -1,6 +1,6 @@
 name: mini_bmob
 description: Bmob API interface encapsulation supports signature, user, ACL and role, location, data association, object, query, etc
-version: 0.1.6
+version: 0.1.7
 homepage: https://github.com/collectFlutter/mini_bmob
 
 environment:
